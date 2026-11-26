@@ -1,0 +1,4 @@
+{"schemaVersion":4,"services":[
+ {"name":"Google","secret":"JBSWY3DPEHPK3PXP","otp":{"issuer":"Google","account":"me@gmail.com","algorithm":"SHA1","digits":6,"period":30,"tokenType":"TOTP"}},
+ {"name":"AWS","secret":"jbsw y3dp ehpk 3pxq","otp":{"account":"root","algorithm":"SHA256","digits":8,"period":60,"tokenType":"TOTP"}}
+]}

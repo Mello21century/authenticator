@@ -1,0 +1,5 @@
+{"version":1,"header":{"slots":null,"params":null},"db":{"version":2,"entries":[
+ {"type":"totp","uuid":"1","name":"john@example.com","issuer":"GitHub","info":{"secret":"JBSWY3DPEHPK3PXP","algo":"SHA1","digits":6,"period":30}},
+ {"type":"steam","uuid":"2","name":"gamer","issuer":"Steam","info":{"secret":"JBSWY3DPEHPK3PXQ","algo":"SHA1","digits":5,"period":30}},
+ {"type":"hotp","uuid":"3","name":"x","issuer":"Old","info":{"secret":"JBSWY3DPEHPK3PXR","algo":"SHA1","digits":6,"counter":1}}
+]}}

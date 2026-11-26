@@ -1,0 +1,4 @@
+otpauth://totp/A:one?secret=JBSWY3DPEHPK3PXP&issuer=A
+
+not a uri
+otpauth://totp/B:two?secret=JBSWY3DPEHPK3PXQ

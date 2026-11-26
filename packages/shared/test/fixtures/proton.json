@@ -1,0 +1,3 @@
+{"version":1,"entries":[
+ {"id":"a","content":{"uri":"otpauth://totp/Proton:me%40proton.me?secret=JBSWY3DPEHPK3PXP&issuer=Proton&algorithm=SHA1&digits=6&period=30","entry_type":"Totp","name":"Proton"},"note":null}
+]}
