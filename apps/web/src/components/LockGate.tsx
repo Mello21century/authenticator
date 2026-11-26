@@ -1,0 +1,63 @@
+import { useEffect, useState, type FormEvent } from 'react';
+import { ApiError } from '@auth/shared';
+import { api } from '../lib/api';
+import { useAuth } from '../lib/auth';
+import { desktop } from '../lib/desktop';
+import { errMsg } from '../lib/ui';
+
+/** Desktop-only lock. Locked at launch and after the configured idle time; web never locks. */
+export function useLock() {
+  const [locked, setLocked] = useState(!!desktop);
+  useEffect(() => {
+    if (!desktop) return;
+    void desktop.isLocked().then(setLocked);
+    return desktop.onLock(() => setLocked(true));
+  }, []);
+  return { locked, unlock: () => setLocked(false) };
+}
+
+export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
+  const { user, logout } = useAuth();
+  const [bio, setBio] = useState<boolean | null>(null);
+  const [password, setPassword] = useState('');
+  const [err, setErr] = useState('');
+
+  async function tryBio() {
+    setErr('');
+    if (await desktop!.unlockBiometric()) onUnlocked();
+    else setErr('Touch ID was cancelled');
+  }
+
+  useEffect(() => {
+    void desktop!.canBiometric().then(ok => { setBio(ok); if (ok) void tryBio(); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function withPassword(e: FormEvent) {
+    e.preventDefault(); setErr('');
+    try {
+      await api.login(user!.email, password); // a password check; MFA challenge also proves the password
+      await desktop!.markUnlocked();
+      onUnlocked();
+    } catch (x) { setErr(x instanceof ApiError && x.status === 401 ? 'Wrong password' : errMsg(x)); }
+  }
+
+  return (
+    <div className="lock">
+      <div className="lock-card">
+        <div className="lock-icon">🔒</div>
+        <h2>Authenticator is locked</h2>
+        <p className="muted" style={{ margin: 0 }}>{user?.email}</p>
+        {bio && <button className="btn primary block" onClick={tryBio}>Unlock with Touch ID</button>}
+        {bio === false && (
+          <form className="stack" style={{ width: '100%' }} onSubmit={withPassword}>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" aria-label="Password" autoFocus autoComplete="current-password" />
+            <button className="btn primary block">Unlock</button>
+          </form>
+        )}
+        {err && <div className="error">{err}</div>}
+        <button className="btn small" onClick={logout}>Sign out</button>
+      </div>
+    </div>
+  );
+}

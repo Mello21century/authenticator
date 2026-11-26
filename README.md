@@ -34,4 +34,4 @@ pnpm test              # all workspace tests (API tests use an in-memory MongoDB
 3. Domains → add `auth.your-domain` → service **web**, port **80**, HTTPS on.
 4. Enable auto deploy (webhook) so each push to `main` redeploys.
 
-Local run of the same stack: `docker network create dokploy-network` once, then `docker compose up --build`.
+Local run of the same stack: `docker network create dokploy-network` once, then `docker compose -f docker-compose.yml -f docker-compose.local.yml up --build` → http://localhost:8080

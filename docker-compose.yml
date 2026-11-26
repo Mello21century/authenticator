@@ -1,5 +1,5 @@
 # Dokploy "Docker Compose" app source. Set env vars in Dokploy (written to .env next to this file).
-# Domain: Dokploy UI -> Domains -> service "web", port 80 (service "api" port 3000 until the web app exists).
+# Domain: Dokploy UI -> Domains -> service "web", port 80. nginx in web proxies /api to the api service.
 services:
   api:
     build:
@@ -21,6 +21,18 @@ services:
       - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-2}
     depends_on:
       - mongo
+    networks:
+      - default
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - api
     networks:
       - default
       - dokploy-network
