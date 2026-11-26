@@ -1,0 +1,40 @@
+# Dokploy "Docker Compose" app source. Set env vars in Dokploy (written to .env next to this file).
+# Domain: Dokploy UI -> Domains -> service "web", port 80 (service "api" port 3000 until the web app exists).
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - PORT=3000
+      - MONGO_URL=mongodb://mongo:27017/authenticator
+      - JWT_SECRET=${JWT_SECRET}
+      - VAULT_MASTER_KEY=${VAULT_MASTER_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - MAIL_FROM=${MAIL_FROM}
+      - APP_URL=${APP_URL}
+      - SIGNUP_ENABLED=${SIGNUP_ENABLED:-true}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
+    depends_on:
+      - mongo
+    networks:
+      - default
+      - dokploy-network
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - default
+
+volumes:
+  mongo-data:
+
+networks:
+  dokploy-network:
+    external: true
