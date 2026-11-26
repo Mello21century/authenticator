@@ -16,3 +16,4 @@ coverage/
 .DS_Store
 .superpowers/
 release/
+!apps/desktop/build/
