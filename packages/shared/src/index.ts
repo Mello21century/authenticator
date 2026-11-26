@@ -4,3 +4,4 @@ export * from './base32';
 export * from './otpauth';
 export * from './tokens';
 export * from './importers';
+export * from './api';
