@@ -18,6 +18,7 @@ export function useLock() {
 
 export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
   const { user, logout } = useAuth();
+  // password form shows when there is no Touch ID, or as a fallback after a failed/cancelled Touch ID
   const [bio, setBio] = useState<boolean | null>(null);
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
@@ -36,7 +37,7 @@ export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
   async function withPassword(e: FormEvent) {
     e.preventDefault(); setErr('');
     try {
-      await api.login(user!.email, password); // a password check; MFA challenge also proves the password
+      await api.verifyPassword(password); // checks only; no new session
       await desktop!.markUnlocked();
       onUnlocked();
     } catch (x) { setErr(x instanceof ApiError && x.status === 401 ? 'Wrong password' : errMsg(x)); }
@@ -49,7 +50,7 @@ export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
         <h2>Authenticator is locked</h2>
         <p className="muted" style={{ margin: 0 }}>{user?.email}</p>
         {bio && <button className="btn primary block" onClick={tryBio}>Unlock with Touch ID</button>}
-        {bio === false && (
+        {bio !== null && (!bio || err) && (
           <form className="stack" style={{ width: '100%' }} onSubmit={withPassword}>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" aria-label="Password" autoFocus autoComplete="current-password" />
             <button className="btn primary block">Unlock</button>

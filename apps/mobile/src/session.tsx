@@ -14,6 +14,7 @@ interface Session {
   locked: boolean;
   covered: boolean; // app switcher privacy cover
   lockTimeout: number;
+  lockError: string;
   setSession(r: AuthResponse): void;
   signOut(): Promise<void>;
   unlock(): Promise<void>;
@@ -31,10 +32,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [locked, setLocked] = useState(true);
   const [covered, setCovered] = useState(false);
   const [lockTimeout, setTimeoutState] = useState(HOUR);
+  const [lockError, setLockError] = useState('');
 
   const unlock = useCallback(async () => {
+    setLockError('');
+    // no biometrics and no passcode on the device: there is nothing to check against, don't trap the user
+    if ((await LocalAuthentication.getEnrolledLevelAsync()) === LocalAuthentication.SecurityLevel.NONE) {
+      lock.unlock(); setLocked(false); return;
+    }
     const r = await LocalAuthentication.authenticateAsync({ promptMessage: 'Unlock Authenticator' });
     if (r.success) { lock.unlock(); setLocked(false); }
+    else if (r.error !== 'user_cancel' && r.error !== 'app_cancel' && r.error !== 'system_cancel') setLockError(`Couldn't unlock (${r.error}).`);
   }, [lock]);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [lock]);
 
   const value: Session = {
-    ready, user, locked, covered, lockTimeout, unlock,
+    ready, user, locked, covered, lockTimeout, lockError, unlock,
     setSession: r => { setUser(r.user); lock.unlock(); setLocked(false); }, // fresh sign-in counts as unlock
     async signOut() { try { await api.logout(); } finally { setUser(null); } },
     async setLockTimeout(ms) { lock.timeoutMs = ms; setTimeoutState(ms); await SecureStore.setItemAsync('lockTimeout', String(ms)); },

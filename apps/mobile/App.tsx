@@ -15,7 +15,7 @@ type Route = { name: 'vault' } | { name: 'add'; editing?: Entry } | { name: 'set
 
 function Root() {
   const c = useTheme();
-  const { ready, user, locked, covered, unlock } = useSession();
+  const { ready, user, locked, covered, unlock, lockError, signOut } = useSession();
   const [route, setRoute] = useState<Route>({ name: 'vault' });
   const [vaultKey, setVaultKey] = useState(0);
   // prompt biometrics once per lock event; the prompt itself flips AppState, so don't re-prompt after a cancel
@@ -30,14 +30,18 @@ function Root() {
 
   return (
     <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }} importantForAccessibility={locked || covered ? 'no-hide-descendants' : 'auto'} accessibilityElementsHidden={locked || covered}>
       {route.name === 'vault' && <Vault key={vaultKey} onAdd={() => setRoute({ name: 'add' })} onEdit={e => setRoute({ name: 'add', editing: e })} onSettings={() => setRoute({ name: 'settings' })} />}
       {route.name === 'add' && <AddEntry editing={route.editing} onDone={() => { setVaultKey(k => k + 1); setRoute({ name: 'vault' }); }} />}
       {route.name === 'settings' && <Settings onBack={() => { setVaultKey(k => k + 1); setRoute({ name: 'vault' }); }} />}
+      </View>
       {(locked || covered) && (
         <View style={{ position: 'absolute', inset: 0, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 }}>
           <View style={{ width: 68, height: 68, borderRadius: 22, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}><T size={30}>🔒</T></View>
           <T size={18} weight="600">Authenticator is locked</T>
           {locked && !covered && <Btn kind="primary" title="Unlock" onPress={unlock} style={{ alignSelf: 'stretch' }} />}
+          {!!lockError && <T style={{ color: c.danger, textAlign: 'center' }}>{lockError}</T>}
+          {locked && !covered && <Btn title="Sign out" onPress={signOut} style={{ alignSelf: 'stretch' }} />}
         </View>
       )}
     </View>

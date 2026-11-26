@@ -34,3 +34,6 @@ export class ResetDto {
   @IsString() @Length(20, 200) token: string;
   @IsString() @Length(10, 256) password: string;
 }
+export class VerifyPasswordDto {
+  @IsString() @Length(1, 256) password: string;
+}

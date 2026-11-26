@@ -17,24 +17,30 @@ export default function Vault({ onAdd, onEdit, onSettings }: { onAdd(): void; on
   const [toast, setToast] = useState('');
   const [, tick] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const gen = useRef(0); // bumped on every lock/unlock so in-flight requests can't resurrect codes
 
   const loadEntries = useCallback(() => api.listEntries().then(setEntries).catch(e => Alert.alert('Error', errMsg(e))), []);
 
   const loadCodes = useCallback(async () => {
     clearTimeout(timer.current);
+    const mine = gen.current;
     try {
       const r = await api.codes();
+      if (mine !== gen.current) return; // locked (or relocked) while the request was in flight
       setCodes({ ...r, offset: r.serverTime - Date.now() });
       timer.current = setTimeout(loadCodes, nextRefreshDelay(r.codes, r.serverTime));
-    } catch { timer.current = setTimeout(loadCodes, 5000); }
+    } catch {
+      if (mine === gen.current) timer.current = setTimeout(loadCodes, 5000);
+    }
   }, []);
 
   useEffect(() => { void loadEntries(); }, [loadEntries]);
   useEffect(() => {
+    gen.current++;
     if (locked) { clearTimeout(timer.current); setCodes(null); return; } // never keep codes while locked
     void loadCodes();
     const id = setInterval(() => tick(x => x + 1), 1000);
-    return () => { clearTimeout(timer.current); clearInterval(id); };
+    return () => { gen.current++; clearTimeout(timer.current); clearInterval(id); };
   }, [locked, loadCodes]);
 
   const map = useMemo(() => new Map((codes?.codes ?? []).map(x => [x.entryId, x])), [codes]);

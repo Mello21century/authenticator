@@ -3,7 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, MfaEnableDto, CredentialsDto, EmailDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto, ResetDto } from './dto';
+import { ChangePasswordDto, MfaEnableDto, CredentialsDto, EmailDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto, ResetDto, VerifyPasswordDto } from './dto';
 import { CurrentUser, JwtGuard, type ReqUser } from './jwt.guard';
 import { MfaService } from './mfa.service';
 import { ResetService } from './reset.service';
@@ -67,4 +67,11 @@ export class AuthController {
 
   @Post('password/reset') @HttpCode(204) @Throttle(AUTH_LIMIT)
   reset(@Body() b: ResetDto) { return this.resets.reset(b.token, b.password); }
+
+  /** Re-auth for app unlock (desktop without Touch ID): checks the password, issues nothing. */
+  @Post('password/verify') @HttpCode(204) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
+  async verify(@CurrentUser() u: ReqUser, @Body() b: VerifyPasswordDto) {
+    const ok = await this.auth.checkPassword(u.email, b.password);
+    if (!ok) throw new UnauthorizedException('Wrong password');
+  }
 }

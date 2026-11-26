@@ -100,4 +100,15 @@ describe('auth', () => {
     expect((await post('/api/auth/refresh', { refreshToken: u.refreshToken })).statusCode).toBe(401);
     expect((await post('/api/auth/refresh', { refreshToken: ch.json().refreshToken })).statusCode).toBe(200);
   });
+
+  it('password verify checks the password without creating a session', async () => {
+    const u = await signupUser(t.app);
+    const h = { ...NATIVE, ...bearer(u.accessToken) };
+    const conn = t.app.get<Connection>(getConnectionToken());
+    const before = await conn.collection('refreshtokens').countDocuments();
+    expect((await post('/api/auth/password/verify', { password: 'wrong password' }, h)).statusCode).toBe(401);
+    expect((await post('/api/auth/password/verify', { password: u.password }, h)).statusCode).toBe(204);
+    expect(await conn.collection('refreshtokens').countDocuments()).toBe(before);
+    expect((await post('/api/auth/password/verify', { password: u.password })).statusCode).toBe(401); // needs auth
+  });
 });
