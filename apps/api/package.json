@@ -1,0 +1,39 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "swc src -d dist --strip-leading-paths",
+    "start": "node dist/main.js",
+    "dev": "node --watch -r @swc-node/register src/main.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/helmet": "^13.2.0",
+    "@nestjs/common": "^12.6.3",
+    "@nestjs/core": "^12.6.3",
+    "@nestjs/jwt": "^12.0.5",
+    "@nestjs/mongoose": "^12.0.2",
+    "@nestjs/platform-fastify": "^12.6.3",
+    "@nestjs/throttler": "^6.8.0",
+    "argon2": "^0.45.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "mongoose": "^9.13.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^12.6.3",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
+    "@swc-node/register": "^1.10.10",
+    "@swc/jest": "^0.2.39",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "jest": "^30.5.2",
+    "mongodb-memory-server": "^11.4.0",
+    "typescript": "^5.9.3"
+  }
+}

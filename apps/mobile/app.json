@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Authenticator",
+    "slug": "authenticator",
+    "scheme": "sz4hauth",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.sz4h.authenticator",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Unlock your authenticator codes with Face ID.",
+        "NSCameraUsageDescription": "Scan 2FA QR codes.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.sz4h.authenticator",
+      "adaptiveIcon": {
+        "backgroundColor": "#16141c",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": ["android.permission.CAMERA", "android.permission.USE_BIOMETRIC"],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-secure-store",
+      ["expo-local-authentication", { "faceIDPermission": "Unlock your authenticator codes with Face ID." }],
+      ["expo-camera", { "cameraPermission": "Scan 2FA QR codes.", "recordAudioAndroid": false }]
+    ]
+  }
+}
