@@ -53,6 +53,15 @@ describe('importVault', () => {
     expect(r.entries).toEqual([{ ...base, issuer: 'ACME', label: 'john', secret: 'JBSWY3DPEHPK3PXP' }]);
     expect(r.errors).toHaveLength(1);
   });
+  it('google migration keeps a raw + in base64 data and decodes utf-8 names', () => {
+    const secret = [72, 101, 108, 108, 111, 33, 0xde, 0xad, 0xbe, 0xef];
+    const p = [...field(1, secret), ...field(2, str('jöhn')), ...field(3, str('ACME')), ...field(6, 2)];
+    const b64 = Buffer.from(field(1, p)).toString("base64");
+    // craft a payload whose base64 contains '+' unescaped
+    const uri = 'otpauth-migration://offline?data=' + b64;
+    const r = importVault(uri);
+    expect(r.entries[0]?.label).toBe('jöhn');
+  });
   it('google migration with junk data throws', () => {
     expect(() => importVault('otpauth-migration://offline?data=%%%')).toThrow();
   });

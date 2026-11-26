@@ -3,12 +3,25 @@ import type { Algorithm, EntryInput } from './types';
 
 const ALGOS: Algorithm[] = ['SHA1', 'SHA256', 'SHA512'];
 
+/** Query-string parser that doesn't rely on URLSearchParams (partial in React Native). */
+export function parseQuery(q: string): Map<string, string> {
+  const m = new Map<string, string>();
+  for (const part of q.split('&')) {
+    if (!part) continue;
+    const i = part.indexOf('=');
+    const dec = (x: string) => decodeURIComponent(x.replace(/\+/g, ' '));
+    const k = dec(i < 0 ? part : part.slice(0, i)).toLowerCase();
+    if (!m.has(k)) m.set(k, i < 0 ? '' : dec(part.slice(i + 1)));
+  }
+  return m;
+}
+
 export function parseOtpauthUri(uri: string): EntryInput {
   const m = /^otpauth:\/\/([a-z]+)\/([^?]*)(?:\?(.*))?$/i.exec(uri.trim());
   if (!m) throw new Error('Not an otpauth:// URI');
   const kind = m[1].toLowerCase();
   if (kind !== 'totp' && kind !== 'steam') throw new Error(`Unsupported OTP type: ${kind}`);
-  const params = new URLSearchParams(m[3] ?? '');
+  const params = parseQuery(m[3] ?? '');
   const rawSecret = params.get('secret');
   if (!rawSecret) throw new Error('Missing secret');
 
@@ -30,11 +43,9 @@ export function parseOtpauthUri(uri: string): EntryInput {
 
 export function buildOtpauthUri(e: EntryInput): string {
   const name = e.issuer ? `${encodeURIComponent(e.issuer)}:${encodeURIComponent(e.label)}` : encodeURIComponent(e.label);
-  const p = new URLSearchParams({ secret: e.secret });
-  if (e.issuer) p.set('issuer', e.issuer);
-  p.set('algorithm', e.algorithm);
-  p.set('digits', String(e.digits));
-  p.set('period', String(e.period));
-  if (e.type === 'steam') p.set('encoder', 'steam');
-  return `otpauth://totp/${name}?${p.toString()}`;
+  const p: [string, string][] = [['secret', e.secret]];
+  if (e.issuer) p.push(['issuer', e.issuer]);
+  p.push(['algorithm', e.algorithm], ['digits', String(e.digits)], ['period', String(e.period)]);
+  if (e.type === 'steam') p.push(['encoder', 'steam']);
+  return `otpauth://totp/${name}?${p.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')}`;
 }

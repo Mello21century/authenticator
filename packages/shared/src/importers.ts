@@ -1,5 +1,5 @@
 import { base32Encode, normalizeBase32 } from './base32';
-import { parseOtpauthUri } from './otpauth';
+import { parseOtpauthUri, parseQuery } from './otpauth';
 import type { Algorithm, EntryInput } from './types';
 
 export type ImportFormat = 'auto' | 'aegis' | '2fas' | 'proton' | 'gauth-migration' | 'uri-list';
@@ -77,11 +77,13 @@ function readProto(buf: Uint8Array): Map<number, (number | Uint8Array)[]> {
 }
 
 function gauth(text: string): ImportResult {
-  const data = new URL(text.trim()).searchParams.get('data');
+  const q = text.trim().split('?')[1] ?? '';
+  // '+' must survive: it is base64, not a space
+  const data = parseQuery(q.replace(/\+/g, '%2B')).get('data');
   if (!data) throw new Error('Missing data in migration QR');
   let bytes: Uint8Array;
   try { bytes = Uint8Array.from(atob(data), c => c.charCodeAt(0)); } catch { throw new Error('Invalid migration QR data'); }
-  const dec = new TextDecoder();
+  const dec = { decode: utf8 };
   const first = <T>(m: Map<number, (number | Uint8Array)[]>, n: number) => m.get(n)?.[0] as T | undefined;
   const params = (readProto(bytes).get(1) ?? []) as Uint8Array[];
   return collect(params, (_p, i) => `#${i + 1}`, p => {
@@ -107,4 +109,10 @@ export function importVault(text: string, format: ImportFormat = 'auto'): Import
   if (format === '2fas' || (format === 'auto' && ('services' in j || 'servicesEncrypted' in j))) return twofas(j);
   if (format === 'proton' || (format === 'auto' && j.entries?.[0]?.content)) return proton(j);
   throw new Error('Unrecognized import format');
+}
+
+function utf8(b: Uint8Array): string {
+  let s = '';
+  for (const x of b) s += '%' + x.toString(16).padStart(2, '0');
+  try { return decodeURIComponent(s); } catch { return String.fromCharCode(...b); }
 }
