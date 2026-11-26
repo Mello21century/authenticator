@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+out/
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.keystore
+*.jks
+.expo/
+ios/
+android/
+coverage/
+.DS_Store
