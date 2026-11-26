@@ -7,8 +7,9 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p .",
-    "dev": "pnpm build && electron .",
-    "dist": "pnpm --filter web build && pnpm build && electron-builder"
+    "dev": "pnpm --filter web exec vite build && pnpm build && electron .",
+    "dist": "pnpm --filter web build && pnpm build && electron-builder",
+    "test": "pnpm build && node --test dist/lock.test.js"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

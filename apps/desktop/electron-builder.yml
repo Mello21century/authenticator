@@ -1,0 +1,30 @@
+appId: com.sz4h.authenticator
+productName: Authenticator
+directories:
+  output: release
+files:
+  - dist/**/*
+  - package.json
+extraResources:
+  - from: ../web/dist
+    to: web
+  - from: build
+    to: build
+    filter: ["tray*.png"]
+mac:
+  category: public.app-category.utilities
+  icon: build/icon.png
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  hardenedRuntime: true
+win:
+  icon: build/icon.png
+  target: [nsis]
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+linux:
+  icon: build/icon.png
+  target: [AppImage]
+  category: Utility
