@@ -3,16 +3,17 @@ import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, CodeDto, CredentialsDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto } from './dto';
+import { ChangePasswordDto, CodeDto, CredentialsDto, EmailDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto, ResetDto } from './dto';
 import { CurrentUser, JwtGuard, type ReqUser } from './jwt.guard';
 import { MfaService } from './mfa.service';
+import { ResetService } from './reset.service';
 import { TokensService } from './tokens.service';
 
 const AUTH_LIMIT = { default: { limit: 10, ttl: 60_000 } };
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService, private readonly tokens: TokensService, private readonly users: UsersService, private readonly mfa: MfaService) {}
+  constructor(private readonly auth: AuthService, private readonly tokens: TokensService, private readonly users: UsersService, private readonly mfa: MfaService, private readonly resets: ResetService) {}
 
   @Post('signup') @Throttle(AUTH_LIMIT)
   signup(@Body() b: CredentialsDto, @Req() req: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
@@ -60,4 +61,10 @@ export class AuthController {
 
   @Post('mfa/disable') @HttpCode(204) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
   mfaDisable(@CurrentUser() u: ReqUser, @Body() b: MfaDisableDto) { return this.mfa.disable(u.id, b.password, b.code); }
+
+  @Post('password/forgot') @HttpCode(204) @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  forgot(@Body() b: EmailDto) { return this.resets.forgot(b.email); }
+
+  @Post('password/reset') @HttpCode(204) @Throttle(AUTH_LIMIT)
+  reset(@Body() b: ResetDto) { return this.resets.reset(b.token, b.password); }
 }

@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './jwt.guard';
 import { REFRESH_TOKEN, RefreshTokenSchema } from './refresh-token.schema';
 import { MfaService } from './mfa.service';
+import { RESET_TOKEN, ResetService, ResetTokenSchema } from './reset.service';
 import { TokensService } from './tokens.service';
 
 @Global()
@@ -19,11 +20,11 @@ export class AuthModule {
       module: AuthModule,
       imports: [
         JwtModule.register({ secret: cfg.jwtSecret }),
-        MongooseModule.forFeature([{ name: USER, schema: UserSchema }, { name: REFRESH_TOKEN, schema: RefreshTokenSchema }]),
+        MongooseModule.forFeature([{ name: USER, schema: UserSchema }, { name: REFRESH_TOKEN, schema: RefreshTokenSchema }, { name: RESET_TOKEN, schema: ResetTokenSchema }]),
       ],
       controllers: [AuthController],
-      providers: [UsersService, TokensService, AuthService, JwtGuard, MfaService],
-      exports: [UsersService, TokensService, AuthService, JwtGuard, MfaService, JwtModule, MongooseModule],
+      providers: [UsersService, TokensService, AuthService, JwtGuard, MfaService, ResetService],
+      exports: [UsersService, TokensService, AuthService, JwtGuard, MfaService, ResetService, JwtModule, MongooseModule],
     };
   }
 }
