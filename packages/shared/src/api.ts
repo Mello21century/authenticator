@@ -88,7 +88,7 @@ export function createApi(o: ApiOptions) {
     resetPassword: (token: string, password: string) => raw<void>('POST', '/auth/password/reset', { token, password }, false),
     changePassword: (current: string, next: string) => call<AuthResponse>('POST', '/auth/password/change', { current, next }).then(handleAuth),
     mfaSetup: () => call<{ secret: string; otpauthUri: string }>('POST', '/auth/mfa/setup'),
-    mfaEnable: (code: string) => call<{ recoveryCodes: string[] }>('POST', '/auth/mfa/enable', { code }),
+    mfaEnable: (code: string, password: string) => call<{ recoveryCodes: string[] }>('POST', '/auth/mfa/enable', { code, password }),
     mfaDisable: (password: string, code: string) => call<void>('POST', '/auth/mfa/disable', { password, code }),
     listEntries: () => call<Entry[]>('GET', '/entries'),
     createEntry: (e: EntryInput) => call<Entry>('POST', '/entries', e),

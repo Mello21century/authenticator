@@ -3,7 +3,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, CodeDto, CredentialsDto, EmailDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto, ResetDto } from './dto';
+import { ChangePasswordDto, MfaEnableDto, CredentialsDto, EmailDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto, ResetDto } from './dto';
 import { CurrentUser, JwtGuard, type ReqUser } from './jwt.guard';
 import { MfaService } from './mfa.service';
 import { ResetService } from './reset.service';
@@ -57,7 +57,7 @@ export class AuthController {
   mfaSetup(@CurrentUser() u: ReqUser) { return this.mfa.setup(u.id); }
 
   @Post('mfa/enable') @HttpCode(200) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
-  mfaEnable(@CurrentUser() u: ReqUser, @Body() b: CodeDto) { return this.mfa.enable(u.id, b.code); }
+  mfaEnable(@CurrentUser() u: ReqUser, @Body() b: MfaEnableDto) { return this.mfa.enable(u.id, b.code, b.password); }
 
   @Post('mfa/disable') @HttpCode(204) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
   mfaDisable(@CurrentUser() u: ReqUser, @Body() b: MfaDisableDto) { return this.mfa.disable(u.id, b.password, b.code); }

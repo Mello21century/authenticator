@@ -25,8 +25,10 @@ export class MfaService {
     return { secret, otpauthUri };
   }
 
-  async enable(userId: string, code: string) {
+  async enable(userId: string, code: string, password: string) {
     const u = await this.users.byId(userId);
+    // step-up: a stolen access token alone must not be able to bind the account to an attacker's authenticator
+    if (!u?.passwordHash || !(await argon2.verify(u.passwordHash, password))) throw new UnauthorizedException('Wrong password');
     if (!u?.mfa || u.mfa.enabled) throw new BadRequestException('Start two-factor setup first');
     if (!verifyTotp(this.secretOf(u), code)) throw new BadRequestException('Invalid code');
     const recoveryCodes = Array.from({ length: 10 }, () => {

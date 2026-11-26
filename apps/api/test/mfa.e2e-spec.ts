@@ -16,8 +16,10 @@ async function enrolled() {
   expect(setup.statusCode).toBe(200);
   const { secret, otpauthUri } = setup.json();
   expect(otpauthUri).toMatch(/^otpauth:\/\/totp\//);
-  expect((await post('/api/auth/mfa/enable', { code: '000000' === codeFor(secret) ? '111111' : '000000' }, h)).statusCode).toBe(400);
-  const en = await post('/api/auth/mfa/enable', { code: codeFor(secret) }, h);
+  expect((await post('/api/auth/mfa/enable', { code: '000000' === codeFor(secret) ? '111111' : '000000', password: u.password }, h)).statusCode).toBe(400);
+  expect((await post('/api/auth/mfa/enable', { code: codeFor(secret), password: 'not my password' }, h)).statusCode).toBe(401);
+  expect((await post('/api/auth/mfa/enable', { code: codeFor(secret) }, h)).statusCode).toBe(400);
+  const en = await post('/api/auth/mfa/enable', { code: codeFor(secret), password: u.password }, h);
   expect(en.statusCode).toBe(200);
   return { ...u, h, secret, recoveryCodes: en.json().recoveryCodes as string[] };
 }

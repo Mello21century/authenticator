@@ -19,8 +19,9 @@ export class MfaLoginDto {
   @IsString() @MaxLength(2000) mfaToken: string;
   @IsString() @Length(6, 20) code: string;
 }
-export class CodeDto {
+export class MfaEnableDto {
   @IsString() @Length(6, 6) code: string;
+  @IsString() @Length(1, 256) password: string;
 }
 export class MfaDisableDto {
   @IsString() @Length(1, 256) password: string;

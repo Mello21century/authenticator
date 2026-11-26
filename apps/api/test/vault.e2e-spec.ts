@@ -51,7 +51,7 @@ describe('vault', () => {
     // enable mfa → code required
     const setup = (await req(u, 'POST', '/api/auth/mfa/setup')).json();
     const code = () => totp(base32Decode(setup.secret), { algorithm: 'SHA1', digits: 6, period: 30, type: 'totp' }).code;
-    await req(u, 'POST', '/api/auth/mfa/enable', { code: code() });
+    await req(u, 'POST', '/api/auth/mfa/enable', { code: code(), password: u.password });
     expect((await req(u, 'POST', '/api/vault/export', { password: u.password })).statusCode).toBe(401);
     expect((await req(u, 'POST', '/api/vault/export', { password: u.password, code: code() })).statusCode).toBe(200);
   });
