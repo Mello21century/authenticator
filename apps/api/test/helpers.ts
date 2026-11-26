@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { randomBytes } from 'node:crypto';
 import { Test } from '@nestjs/testing';
-import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { AppModule } from '../src/app.module';
 import type { AppConfig } from '../src/config';
 import { MailService } from '../src/mail/mail.service';
-import { configureApp } from '../src/setup';
+import { configureApp, createAdapter } from '../src/setup';
 
 export interface SentMail { to: string; subject: string; text: string }
 
@@ -16,14 +16,14 @@ export async function makeApp(overrides: Partial<AppConfig> = {}) {
   mongo ??= await MongoMemoryServer.create();
   const cfg: AppConfig = {
     port: 0, mongoUrl: mongo.getUri(`t${randomBytes(6).toString('hex')}`), jwtSecret: 'x'.repeat(40), vaultKey: randomBytes(32),
-    resendApiKey: 're_test', mailFrom: 'test@example.com', appUrl: 'https://app.test', signupEnabled: true, corsOrigins: [],
+    resendApiKey: 're_test', mailFrom: 'test@example.com', appUrl: 'https://app.test', signupEnabled: true, corsOrigins: [], trustProxyHops: 0,
     disableThrottle: true, ...overrides,
   };
   const mail = { sent: [] as SentMail[] };
   const mod = await Test.createTestingModule({ imports: [AppModule.forRoot(cfg)] })
     .overrideProvider(MailService).useValue({ send: async (to: string, subject: string, text: string) => { mail.sent.push({ to, subject, text }); } })
     .compile();
-  const app = mod.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+  const app = mod.createNestApplication<NestFastifyApplication>(createAdapter(cfg));
   await configureApp(app, cfg);
   await app.init();
   await app.getHttpAdapter().getInstance().ready();

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Types, type Model } from 'mongoose';
 import type { ReqUser } from '../auth/jwt.guard';
@@ -22,6 +22,7 @@ export function normalizeShape<T extends { type?: string; digits?: number }>(e: 
 
 @Injectable()
 export class EntriesService {
+  private readonly log = new Logger('Entries');
   constructor(@InjectModel(ENTRY) readonly model: Model<EntryDoc>, private readonly cipher: VaultCipher) {}
 
   view(e: EntryDoc, me: ReqUser): EntryView {
@@ -92,9 +93,14 @@ export class EntriesService {
 
   async codes(me: ReqUser) {
     const now = Date.now();
-    const codes = (await this.visible(me)).map(e => {
-      const { code, expiresAt } = totp(base32Decode(this.secretOf(e)), { algorithm: e.algorithm, digits: e.digits, period: e.period, type: e.type, now });
-      return { entryId: String(e._id), code, period: e.period, expiresAt };
+    const codes = (await this.visible(me)).flatMap(e => {
+      try {
+        const { code, expiresAt } = totp(base32Decode(this.secretOf(e)), { algorithm: e.algorithm, digits: e.digits, period: e.period, type: e.type, now });
+        return [{ entryId: String(e._id), code, period: e.period, expiresAt }];
+      } catch (err) {
+        this.log.error(`entry ${e._id} cannot be decrypted: ${(err as Error).message}`);
+        return [];
+      }
     });
     return { serverTime: now, codes };
   }

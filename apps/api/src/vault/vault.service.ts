@@ -26,8 +26,18 @@ export class VaultService {
     const docs = items.map((d, i) => this.entries.toDoc(me._id, d, base + i));
     const existing = new Set((await this.entries.model.find({ ownerId: me._id, fp: { $in: docs.map(d => d.fp) } }, { fp: 1 }).lean()).map(d => d.fp));
     const fresh = docs.filter(d => !existing.has(d.fp) && (existing.add(d.fp), true));
-    if (fresh.length) await this.entries.model.insertMany(fresh);
-    return { imported: fresh.length, skipped: docs.length - fresh.length };
+    let imported = 0;
+    if (fresh.length) {
+      try {
+        imported = (await this.entries.model.insertMany(fresh, { ordered: false })).length;
+      } catch (e: any) {
+        // concurrent import inserted some of these first: duplicates count as skipped
+        const errs: any[] = e?.writeErrors ?? [];
+        if (!errs.length || errs.some(w => (w.code ?? w.err?.code) !== 11000)) throw e;
+        imported = e.insertedDocs?.length ?? e.result?.insertedCount ?? fresh.length - errs.length;
+      }
+    }
+    return { imported, skipped: docs.length - imported };
   }
 
   async export(me: ReqUser, password: string, code?: string) {

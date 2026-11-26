@@ -8,6 +8,8 @@ export interface AppConfig {
   appUrl: string;
   signupEnabled: boolean;
   corsOrigins: string[];
+  /** number of reverse proxies in front of the api (Traefik + nginx = 2) */
+  trustProxyHops: number;
   /** test-only: never read from env */
   disableThrottle?: boolean;
 }
@@ -32,10 +34,13 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
   const appUrl = req('APP_URL').replace(/\/+$/, '');
   const port = Number(env.PORT ?? 3000);
   if (!Number.isInteger(port) || port <= 0) errors.push('PORT must be a positive integer');
+  const trustProxyHops = Number(env.TRUST_PROXY_HOPS ?? 2);
+  if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0) errors.push('TRUST_PROXY_HOPS must be a non-negative integer');
   if (errors.length) throw new Error(`Invalid configuration:\n- ${errors.join('\n- ')}`);
   return {
     port, mongoUrl, jwtSecret, vaultKey, resendApiKey, mailFrom, appUrl,
     signupEnabled: (env.SIGNUP_ENABLED ?? 'true').toLowerCase() !== 'false',
+    trustProxyHops,
     corsOrigins: (env.CORS_ORIGINS ?? '').split(',').map(s => s.trim()).filter(Boolean),
   };
 }

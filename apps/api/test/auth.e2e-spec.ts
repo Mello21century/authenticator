@@ -1,3 +1,5 @@
+import { getConnectionToken } from '@nestjs/mongoose';
+import type { Connection } from 'mongoose';
 import { makeApp, signupUser, NATIVE, bearer, type TestApp } from './helpers';
 
 let t: TestApp;
@@ -59,6 +61,9 @@ describe('auth', () => {
     const next = r1.json().refreshToken;
     expect(next).toBeTruthy();
     expect(next).not.toBe(u.refreshToken);
+    // age the rotation past the race grace window so this counts as theft
+    const conn = t.app.get<Connection>(getConnectionToken());
+    await conn.collection('refreshtokens').updateMany({ rotated: true }, { $set: { revokedAt: new Date(Date.now() - 60_000) } });
     expect((await post('/api/auth/refresh', { refreshToken: u.refreshToken })).statusCode).toBe(401); // reuse
     expect((await post('/api/auth/refresh', { refreshToken: next })).statusCode).toBe(401); // whole family dead
   });

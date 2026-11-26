@@ -59,5 +59,7 @@ describe('importVault', () => {
   it('unknown format throws', () => {
     expect(() => importVault('{"foo":1}')).toThrow('Unrecognized import format');
     expect(() => importVault('hello')).toThrow('Unrecognized import format');
+    expect(() => importVault('null')).toThrow('Unrecognized import format');
+    expect(() => importVault('123')).toThrow('Unrecognized import format');
   });
 });

@@ -10,6 +10,7 @@ import { REFRESH_TOKEN, type RefreshTokenDoc } from './refresh-token.schema';
 
 const REFRESH_TTL_MS = 30 * 24 * 3600 * 1000;
 export const COOKIE = 'rt';
+const ROTATION_GRACE_MS = 30_000;
 const COOKIE_OPTS = { httpOnly: true, secure: true, sameSite: 'strict' as const, path: '/api/auth' };
 
 export interface AuthResponse { accessToken: string; refreshToken?: string; user: PublicUser }
@@ -50,11 +51,12 @@ export class TokensService {
     if (doc.revokedAt) {
       // reuse of a rotated token: assume theft, kill every session of this user.
       // tokens revoked by logout / password change just fail.
-      if (doc.rotated) await this.revokeAll(doc.userId);
+      // a token rotated seconds ago is a racing tab/retry, not theft
+      if (doc.rotated && Date.now() - doc.revokedAt.getTime() > ROTATION_GRACE_MS) await this.revokeAll(doc.userId);
       throw new UnauthorizedException();
     }
     const claimed = await this.tokens.updateOne({ _id: doc._id, revokedAt: { $exists: false } }, { revokedAt: new Date(), rotated: true });
-    if (claimed.modifiedCount !== 1) { await this.revokeAll(doc.userId); throw new UnauthorizedException(); }
+    if (claimed.modifiedCount !== 1) throw new UnauthorizedException(); // lost a concurrent rotation race
     const user = await this.users.model.findById(doc.userId).lean<UserDoc>();
     if (!user || !user.passwordHash) throw new UnauthorizedException();
     return this.issue(user, req, reply, doc.family);

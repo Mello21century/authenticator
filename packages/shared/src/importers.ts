@@ -102,6 +102,7 @@ export function importVault(text: string, format: ImportFormat = 'auto'): Import
   if (format === 'uri-list' || (format === 'auto' && t.startsWith('otpauth://'))) return uriList(t);
   let j: any;
   try { j = JSON.parse(t); } catch { throw new Error('Unrecognized import format'); }
+  if (!j || typeof j !== 'object') throw new Error('Unrecognized import format');
   if (format === 'aegis' || (format === 'auto' && 'db' in j)) return aegis(j);
   if (format === '2fas' || (format === 'auto' && ('services' in j || 'servicesEncrypted' in j))) return twofas(j);
   if (format === 'proton' || (format === 'auto' && j.entries?.[0]?.content)) return proton(j);

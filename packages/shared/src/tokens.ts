@@ -1,8 +1,9 @@
 // Design tokens shared by web (CSS vars) and mobile (StyleSheet).
 export const tokens = {
   color: {
-    dark: { bg: '#16141c', surface: '#1f1d26', surface2: '#2a2733', border: '#33303d', text: '#f2f1f5', muted: '#9a98a6', accent: '#8b7cf6', accentText: '#ffffff', danger: '#e5484d', warn: '#f5a524' },
-    light: { bg: '#f7f6fa', surface: '#ffffff', surface2: '#efedf4', border: '#e2e0e8', text: '#1a1822', muted: '#6b6878', accent: '#6d5ae6', accentText: '#ffffff', danger: '#d93036', warn: '#c7850e' },
+    // accent from Proton Authenticator's asset catalog (AccentColor light/dark); rest is our own palette
+    dark: { bg: '#0f0e15', surface: '#191823', surface2: '#232130', border: '#2d2b3b', text: '#f3f2f8', muted: '#9593a6', accent: '#b080ff', accentText: '#140b26', danger: '#ff5c6c', warn: '#f5a524' },
+    light: { bg: '#f6f5fb', surface: '#ffffff', surface2: '#eeecf6', border: '#e3e1ee', text: '#16141f', muted: '#6a6780', accent: '#6d4aff', accentText: '#ffffff', danger: '#dc2f42', warn: '#b7790a' },
   },
   radius: { sm: 8, md: 12, lg: 16, pill: 999 },
   space: [0, 4, 8, 12, 16, 24, 32, 48],
