@@ -5,3 +5,5 @@ export * from './otpauth';
 export * from './tokens';
 export * from './importers';
 export * from './api';
+export * from './codes';
+export * from './lock';

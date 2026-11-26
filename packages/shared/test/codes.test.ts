@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { nextRefreshDelay, remainingMs } from './codes';
+import { nextRefreshDelay, remainingMs } from '../src';
 
 describe('codes timing', () => {
   it('waits until the earliest expiry, corrected for clock offset', () => {

@@ -1,19 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import type { CodeItem } from '@auth/shared';
+import { nextRefreshDelay } from '@auth/shared';
+export { remainingMs, nextRefreshDelay } from '@auth/shared';
 import { api } from './api';
-
-/** ms left on a code, using offset = serverTime - clientNow measured at fetch */
-export function remainingMs(expiresAt: number, offset: number, clientNow = Date.now()): number {
-  return Math.max(0, expiresAt - (clientNow + offset));
-}
-
-/** When to refetch: just after the earliest code expires (+100ms slack), never faster than 250ms. */
-export function nextRefreshDelay(codes: CodeItem[], serverTime: number, _clientNow?: number): number {
-  if (!codes.length) return 30_000;
-  const earliest = Math.min(...codes.map(c => c.expiresAt));
-  return Math.max(250, earliest - serverTime + 100);
-}
 
 export function useCodes(enabled: boolean) {
   const q = useQuery({

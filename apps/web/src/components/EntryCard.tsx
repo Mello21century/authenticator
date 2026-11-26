@@ -1,20 +1,7 @@
 import { useState } from 'react';
-import type { CodeItem, Entry } from '@auth/shared';
+import { avatarColor, formatCode, type CodeItem, type Entry } from '@auth/shared';
 import { remainingMs } from '../lib/codes';
 import { useToast } from '../lib/ui';
-
-const PALETTE = ['#7c5cff', '#e5484d', '#12a594', '#f76b15', '#3e63dd', '#d6409f', '#0090ff', '#46a758'];
-export function avatarColor(s: string) {
-  let h = 0;
-  for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return PALETTE[h % PALETTE.length];
-}
-
-export function formatCode(code: string) {
-  if (code.length === 6) return `${code.slice(0, 3)} ${code.slice(3)}`;
-  if (code.length === 8) return `${code.slice(0, 4)} ${code.slice(4)}`;
-  return code;
-}
 
 function Ring({ left, period }: { left: number; period: number }) {
   const r = 11, c = 2 * Math.PI * r, frac = Math.min(1, left / (period * 1000));

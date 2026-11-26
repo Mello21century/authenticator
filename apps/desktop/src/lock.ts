@@ -1,3 +1,4 @@
+// ponytail: copy of packages/shared/src/lock.ts (desktop compiles to CJS without the workspace TS source)
 /** Lock state machine: locked at launch, re-locks once `timeoutMs` has passed since the last unlock (0 = only on launch). */
 export class LockState {
   locked = true;
