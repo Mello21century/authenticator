@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CONFIG, type AppConfig } from './config';
 import { VaultCipher } from './crypto/vault-cipher';
 import { MailService } from './mail/mail.service';
+import { AuthModule } from './auth/auth.module';
 
 @Controller('health')
 class HealthController {
@@ -35,6 +36,7 @@ export class AppModule {
       imports: [
         CoreModule.forRoot(cfg),
         MongooseModule.forRoot(cfg.mongoUrl),
+        AuthModule.forRoot(cfg),
         ThrottlerModule.forRoot({ throttlers: [{ ttl: 60_000, limit: 100 }], skipIf: () => !!cfg.disableThrottle }),
       ],
       controllers: [HealthController],
