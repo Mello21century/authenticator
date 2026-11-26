@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, type OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Types, type Model } from 'mongoose';
 import type { ReqUser } from '../auth/jwt.guard';
@@ -21,9 +21,12 @@ export function normalizeShape<T extends { type?: string; digits?: number }>(e: 
 }
 
 @Injectable()
-export class EntriesService {
+export class EntriesService implements OnModuleInit {
   private readonly log = new Logger('Entries');
   constructor(@InjectModel(ENTRY) readonly model: Model<EntryDoc>, private readonly cipher: VaultCipher) {}
+
+  // unique (ownerId, fp) must exist before the first write, or concurrent imports duplicate
+  async onModuleInit() { await this.model.init(); }
 
   view(e: EntryDoc, me: ReqUser): EntryView {
     const mine = e.ownerId.equals(me._id);
