@@ -8,6 +8,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './jwt.guard';
 import { REFRESH_TOKEN, RefreshTokenSchema } from './refresh-token.schema';
+import { MfaService } from './mfa.service';
 import { TokensService } from './tokens.service';
 
 @Global()
@@ -21,8 +22,8 @@ export class AuthModule {
         MongooseModule.forFeature([{ name: USER, schema: UserSchema }, { name: REFRESH_TOKEN, schema: RefreshTokenSchema }]),
       ],
       controllers: [AuthController],
-      providers: [UsersService, TokensService, AuthService, JwtGuard],
-      exports: [UsersService, TokensService, AuthService, JwtGuard, JwtModule, MongooseModule],
+      providers: [UsersService, TokensService, AuthService, JwtGuard, MfaService],
+      exports: [UsersService, TokensService, AuthService, JwtGuard, MfaService, JwtModule, MongooseModule],
     };
   }
 }

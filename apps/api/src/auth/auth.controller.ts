@@ -1,17 +1,18 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto, CredentialsDto, LoginDto, RefreshDto } from './dto';
+import { ChangePasswordDto, CodeDto, CredentialsDto, LoginDto, MfaDisableDto, MfaLoginDto, RefreshDto } from './dto';
 import { CurrentUser, JwtGuard, type ReqUser } from './jwt.guard';
+import { MfaService } from './mfa.service';
 import { TokensService } from './tokens.service';
 
 const AUTH_LIMIT = { default: { limit: 10, ttl: 60_000 } };
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService, private readonly tokens: TokensService, private readonly users: UsersService) {}
+  constructor(private readonly auth: AuthService, private readonly tokens: TokensService, private readonly users: UsersService, private readonly mfa: MfaService) {}
 
   @Post('signup') @Throttle(AUTH_LIMIT)
   signup(@Body() b: CredentialsDto, @Req() req: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
@@ -43,4 +44,20 @@ export class AuthController {
   changePassword(@CurrentUser() u: ReqUser, @Body() b: ChangePasswordDto, @Req() req: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     return this.auth.changePassword(u.id, b.current, b.next, req, reply);
   }
+
+  @Post('login/mfa') @HttpCode(200) @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async loginMfa(@Body() b: MfaLoginDto, @Req() req: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
+    const u = await this.mfa.userFromMfaToken(b.mfaToken);
+    if (!(await this.mfa.check(u, b.code))) throw new UnauthorizedException('Invalid code');
+    return this.tokens.issue(u, req, reply);
+  }
+
+  @Post('mfa/setup') @HttpCode(200) @UseGuards(JwtGuard)
+  mfaSetup(@CurrentUser() u: ReqUser) { return this.mfa.setup(u.id); }
+
+  @Post('mfa/enable') @HttpCode(200) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
+  mfaEnable(@CurrentUser() u: ReqUser, @Body() b: CodeDto) { return this.mfa.enable(u.id, b.code); }
+
+  @Post('mfa/disable') @HttpCode(204) @UseGuards(JwtGuard) @Throttle(AUTH_LIMIT)
+  mfaDisable(@CurrentUser() u: ReqUser, @Body() b: MfaDisableDto) { return this.mfa.disable(u.id, b.password, b.code); }
 }
