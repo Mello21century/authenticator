@@ -7,6 +7,7 @@ import { VaultCipher } from './crypto/vault-cipher';
 import { MailService } from './mail/mail.service';
 import { AuthModule } from './auth/auth.module';
 import { EntriesModule } from './entries/entries.module';
+import { MembersModule } from './members/members.module';
 
 @Controller('health')
 class HealthController {
@@ -39,6 +40,7 @@ export class AppModule {
         MongooseModule.forRoot(cfg.mongoUrl),
         AuthModule.forRoot(cfg),
         EntriesModule,
+        MembersModule,
         ThrottlerModule.forRoot({ throttlers: [{ ttl: 60_000, limit: 100 }], skipIf: () => !!cfg.disableThrottle }),
       ],
       controllers: [HealthController],
