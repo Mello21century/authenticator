@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 import { api, saveServer, server } from '../api';
 import { useSession } from '../session';
 import { useTheme } from '../theme';
@@ -39,7 +39,7 @@ export default function Login() {
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: c.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24, gap: 16 }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}><T weight="700" style={{ color: c.accentText }}>◈</T></View>
+          <Image source={require('../../assets/icon.png')} style={{ width: 40, height: 40, borderRadius: 10 }} />
           <T size={22} weight="700">Space Authenticator</T>
         </View>
         <T size={18} weight="600">{title}</T>
