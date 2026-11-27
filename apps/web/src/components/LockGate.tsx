@@ -47,7 +47,7 @@ export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
   return (
     <div className="lock">
       <div className="lock-card">
-        <div className="lock-icon">🔒</div>
+        <img className="lock-icon" src="./logo.png" alt="" />
         <h2>Space Authenticator is locked</h2>
         <p className="muted" style={{ margin: 0 }}>{user?.email}</p>
         {bio && <button className="btn primary block" onClick={tryBio}>Unlock with {label}</button>}

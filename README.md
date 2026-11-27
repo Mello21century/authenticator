@@ -1,8 +1,10 @@
 # Space Authenticator
 
+![Space Authenticator: your 2FA codes on every device, behind your fingerprint](site/assets/cover.png)
+
 Your 2FA codes, synced across web, desktop, mobile and a Chrome side panel, locked behind Touch ID / Face ID / fingerprint.
 
-**Use it:** https://authenticator.sz4h.com
+**Use it:** https://authenticator.sz4h.com · **Docs:** [user guide](https://mello21century.github.io/authenticator/docs/guide.html) · [self-hosting](https://mello21century.github.io/authenticator/docs/self-hosting.html)
 
 **Download:**
 [Mac (Apple silicon)](https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-arm64.dmg) ·
@@ -14,7 +16,7 @@ Your 2FA codes, synced across web, desktop, mobile and a Chrome side panel, lock
 
 **License:** source-available, not open source. You may read the code, use the official apps and run unmodified copies; modifying or redistributing it needs the owner's written approval. See [LICENSE](LICENSE).
 
-## How it works
+## <img src="site/assets/icons/book.svg" width="22" align="top" alt="" /> How it works
 
 Self-hosted 2FA authenticator: NestJS API (codes generated server-side, secrets AES-256-GCM encrypted in MongoDB), React web app, Electron desktop app, Expo mobile app.
 
@@ -26,7 +28,7 @@ apps/mobile     Expo / React Native (Face ID / fingerprint lock)
 packages/shared API client, types, otpauth + importers, design tokens
 ```
 
-## Develop
+## <img src="site/assets/icons/terminal.svg" width="22" align="top" alt="" /> Develop
 
 ```sh
 pnpm install
@@ -34,7 +36,7 @@ cp .env.example .env   # fill VAULT_MASTER_KEY (openssl rand -base64 32) and JWT
 pnpm test              # all workspace tests (API tests use an in-memory MongoDB)
 ```
 
-## Deploy on Dokploy
+## <img src="site/assets/icons/server.svg" width="22" align="top" alt="" /> Deploy on Dokploy
 
 1. Dokploy → Create service → **Compose** → provider GitHub → this repo, branch `main`, compose path `./docker-compose.yml`.
 2. Environment (Dokploy writes it to `.env` next to the compose file):
@@ -52,7 +54,7 @@ pnpm test              # all workspace tests (API tests use an in-memory MongoDB
 
 Local run of the same stack: `docker network create dokploy-network` once, then `docker compose -f docker-compose.yml -f docker-compose.local.yml up --build` → http://localhost:8080
 
-## Desktop (Electron)
+## <img src="site/assets/icons/laptop.svg" width="22" align="top" alt="" /> Desktop (Electron)
 
 ```sh
 pnpm --filter desktop dev                              # builds web + desktop, opens the app (API: http://localhost:8080/api)
@@ -61,17 +63,17 @@ AUTH_API_URL=https://auth.your-domain/api pnpm --filter desktop dist   # dmg / n
 The server URL can also be changed on the login screen (Server). Add `app://authenticator` to `CORS_ORIGINS` on the API.
 Signing: set `CSC_LINK`/`CSC_KEY_PASSWORD` (macOS Developer ID + notarization env) before `dist`.
 
-## Chrome extension (`apps/extension`)
+## <img src="site/assets/icons/extension.svg" width="22" align="top" alt="" /> Chrome extension (`apps/extension`)
 Side panel with the same vault UI, locked behind Touch ID / Windows Hello (WebAuthn platform authenticator), password fallback.
 - Build: `pnpm --filter extension build` -> `apps/extension/dist`
 - Install for testing: `chrome://extensions` -> Developer mode -> **Load unpacked** -> pick `apps/extension/dist`
 - Open: toolbar icon or **Cmd/Ctrl+Shift+2**; the search is pre-filled with the current site when a matching account exists.
 - The `key` in `manifest.json` pins the ID to `dgmbchpaamaioijdcifhfjbbpkgkdadl` (allowed in the API's `CORS_ORIGINS`). `apps/extension/key.pem` is gitignored; keep a backup. A Chrome Web Store listing gets its own ID: add it to `CORS_ORIGINS`.
 
-## Logo
+## <img src="site/assets/icons/fingerprint.svg" width="22" align="top" alt="" /> Logo
 `design/logo/apply.sh [source.png]` regenerates every app icon from one 1024px image.
 
-## Mobile (Expo)
+## <img src="site/assets/icons/phone.svg" width="22" align="top" alt="" /> Mobile (Expo)
 
 ```sh
 cd apps/mobile

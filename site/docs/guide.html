@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User guide · Space Authenticator</title>
+  <meta name="description" content="How to add accounts, unlock, import, share and install Space Authenticator." />
+  <link rel="icon" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="../"><img src="../assets/logo.png" alt="" />Space Authenticator</a>
+      <nav aria-label="Main">
+        <a href="guide.html" aria-current="page">User guide</a>
+        <a class="hide-sm" href="self-hosting.html">Self-host</a>
+        <a class="hide-sm" href="https://github.com/Mello21century/authenticator">GitHub</a>
+        <a class="btn" href="../#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap doc">
+    <aside>
+      <p>On this page</p>
+      <ol>
+        <li><a href="#start">Create your account</a></li>
+        <li><a href="#add">Add an account</a></li>
+        <li><a href="#use">Copy a code</a></li>
+        <li><a href="#lock">Lock and unlock</a></li>
+        <li><a href="#chrome">Chrome side panel</a></li>
+        <li><a href="#install">Install the apps</a></li>
+        <li><a href="#import">Import from another app</a></li>
+        <li><a href="#export">Export a backup</a></li>
+        <li><a href="#members">Family and team members</a></li>
+        <li><a href="#mfa">Protect your own sign-in</a></li>
+        <li><a href="#password">Forgot your password</a></li>
+        <li><a href="#server">Use a different server</a></li>
+      </ol>
+    </aside>
+    <article>
+      <h1>User guide</h1>
+      <p>Everything you can do in Space Authenticator, on every device.</p>
+
+      <h2 id="start">Create your account</h2>
+      <p>Open <a href="https://authenticator.sz4h.com">authenticator.sz4h.com</a> or any of the apps and choose <b>Create account</b>. Use a password of at least 10 characters. The same email and password sign you in everywhere.</p>
+
+      <h2 id="add">Add an account</h2>
+      <p>When a website shows you a QR code to set up two-factor authentication, choose <b>+</b> in Space Authenticator and pick one of these:</p>
+      <ul>
+        <li><b>Scan with your phone:</b> the mobile app opens the camera and reads the QR code.</li>
+        <li><b>QR image:</b> on the web and desktop, upload a screenshot of the QR code or paste it from the clipboard.</li>
+        <li><b>Link:</b> paste an <code>otpauth://</code> link if the website offers one.</li>
+        <li><b>Type it in:</b> enter the setup key the website shows under "can't scan the code?".</li>
+      </ul>
+      <p>Type the six-digit code back into the website to finish. The account appears on all your devices right away.</p>
+
+      <h2 id="use">Copy a code</h2>
+      <p>Click or tap a code to copy it. The ring next to each code shows how long it has left; it turns amber in the last five seconds, so wait for the next code if you're a slow typist. Start typing to search: the search box is focused whenever you open the app.</p>
+
+      <h2 id="lock">Lock and unlock</h2>
+      <p>The Mac, Windows, mobile and Chrome apps hide your codes until you unlock them. They always lock when they start, and lock again after the time you choose in <b>Settings → App lock</b>: 1 minute, 15 minutes, 1 hour (the default), or only when the app restarts.</p>
+      <table>
+        <thead><tr><th>App</th><th>Unlocks with</th></tr></thead>
+        <tbody>
+          <tr><td>Mac</td><td>Touch ID, or your account password</td></tr>
+          <tr><td>Windows</td><td>Your account password</td></tr>
+          <tr><td>iPhone / Android</td><td>Face ID, fingerprint or your device passcode</td></tr>
+          <tr><td>Chrome on Mac</td><td>Touch ID, or your account password</td></tr>
+          <tr><td>Chrome on Windows</td><td>Windows Hello (fingerprint, face or PIN), or your account password</td></tr>
+        </tbody>
+      </table>
+      <p>The web app in a browser tab doesn't lock; sign out when you leave a shared computer.</p>
+
+      <h2 id="chrome">Chrome side panel</h2>
+      <p>The extension opens your codes in Chrome's side panel next to the page you're signing in to.</p>
+      <ol>
+        <li>Download <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-chrome-extension.zip">the extension zip</a> and unzip it.</li>
+        <li>Open <code>chrome://extensions</code> and turn on <b>Developer mode</b> (top right).</li>
+        <li>Choose <b>Load unpacked</b> and select the unzipped folder.</li>
+        <li>Pin Space Authenticator from the puzzle-piece menu.</li>
+      </ol>
+      <p>Open it with the toolbar icon or <kbd>⌘</kbd><kbd>⇧</kbd><kbd>2</kbd> (<kbd>Ctrl</kbd><kbd>⇧</kbd><kbd>2</kbd> on Windows). If you have an account for the site in the current tab, the search is already filled in, so the right code is the only one showing. You can change the shortcut at <code>chrome://extensions/shortcuts</code>.</p>
+      <p>The first time you unlock, Chrome asks to create a passkey for the lock. It stays on your device and is only used to unlock the panel.</p>
+
+      <h2 id="install">Install the apps</h2>
+      <h3>Mac</h3>
+      <p>Download the <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-arm64.dmg">Apple silicon</a> or <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-x64.dmg">Intel</a> version (Apple menu → About This Mac tells you which), open it and drag the app to Applications.</p>
+      <div class="callout warn">If macOS says the app "can't be checked for malicious software", open <b>System Settings → Privacy &amp; Security</b> and choose <b>Open Anyway</b>. This goes away once releases are notarized by Apple.</div>
+      <h3>Windows</h3>
+      <p>Run the <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-windows-setup.exe">installer</a>. If Windows shows "Windows protected your PC", choose <b>More info → Run anyway</b>. The app keeps running in the system tray when you close its window; right-click the tray icon to lock or quit.</p>
+      <h3>As a web app</h3>
+      <p>In Chrome or Edge, open the web app and choose the install icon at the right of the address bar. It gets its own window and icon without downloading anything.</p>
+
+      <h2 id="import">Import from another app</h2>
+      <p>Go to <b>Settings → Import</b>, then choose a file or paste text. Accounts you already have are skipped.</p>
+      <table>
+        <thead><tr><th>From</th><th>What to export there</th></tr></thead>
+        <tbody>
+          <tr><td>Google Authenticator</td><td>Transfer accounts → Export, then scan the QR code with the mobile app or paste the <code>otpauth-migration://</code> link</td></tr>
+          <tr><td>Aegis</td><td>Export as a plain (unencrypted) JSON file</td></tr>
+          <tr><td>2FAS</td><td>Export a backup without a password</td></tr>
+          <tr><td>Proton Authenticator</td><td>Export as an unencrypted JSON file</td></tr>
+          <tr><td>Anything else</td><td>A list of <code>otpauth://</code> links, one per line</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warn">Unencrypted exports contain your setup keys. Delete the file once the import is done.</div>
+
+      <h2 id="export">Export a backup</h2>
+      <p><b>Settings → Export</b> downloads every account you own as <code>otpauth://</code> links in a JSON file, which you can import here again or into most other authenticators. You'll confirm your password first (and a code, if you've turned on two-factor sign-in). Codes shared with you by someone else are not included. Store the file somewhere encrypted.</p>
+
+      <h2 id="members">Family and team members</h2>
+      <p>The account owner can invite people in <b>Settings → Members</b>. Each person gets an email to set their password. Then, from the <b>⋯</b> menu on any account, choose <b>Share</b> and tick who should see it.</p>
+      <ul>
+        <li>Members see shared codes but can't see the setup key, edit or delete them.</li>
+        <li>Members can add their own private accounts, which the owner can't see.</li>
+        <li>Removing a member deletes their access and their account.</li>
+      </ul>
+
+      <h2 id="mfa">Protect your own sign-in</h2>
+      <p>Turn on two-factor sign-in in <b>Settings → Two-factor login</b>: scan the QR code with a different authenticator (not this one), enter a code and your password, and save the ten recovery codes somewhere safe. Each recovery code works once if you lose that authenticator.</p>
+
+      <h2 id="password">Forgot your password</h2>
+      <p>Choose <b>Forgot password?</b> on the sign-in screen. The email link works for 30 minutes and only once. Resetting your password signs you out on every device.</p>
+
+      <h2 id="server">Use a different server</h2>
+      <p>The desktop, mobile and Chrome apps connect to <code>authenticator.sz4h.com</code>. If you <a href="self-hosting.html">run your own server</a>, open <b>Server</b> on the sign-in screen and enter its address, ending in <code>/api</code>.</p>
+    </article>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>Space Authenticator by sz4h. <a href="https://github.com/Mello21century/authenticator/blob/main/LICENSE">License</a></span>
+      <nav aria-label="Footer"><a href="../">Home</a><a href="self-hosting.html">Self-host</a><a href="https://github.com/Mello21century/authenticator/issues">Report a problem</a></nav>
+    </div>
+  </footer>
+</body>
+</html>

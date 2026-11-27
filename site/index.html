@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Space Authenticator: your 2FA codes on every device</title>
+  <meta name="description" content="Space Authenticator keeps your two-factor codes in sync across web, Mac, Windows, phones and a Chrome side panel, locked behind your fingerprint or face." />
+  <meta property="og:title" content="Space Authenticator" />
+  <meta property="og:description" content="Your 2FA codes on every device, behind your fingerprint." />
+  <meta property="og:image" content="https://mello21century.github.io/authenticator/assets/cover.png" />
+  <meta name="theme-color" content="#eef1f5" />
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/logo.png" alt="" />Space Authenticator</a>
+      <nav aria-label="Main">
+        <a class="hide-sm" href="docs/guide.html">User guide</a>
+        <a class="hide-sm" href="docs/self-hosting.html">Self-host</a>
+        <a class="hide-sm" href="https://github.com/Mello21century/authenticator">GitHub</a>
+        <a class="btn" href="#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div>
+          <h1 id="hero-title">Your 2FA codes, on every device, behind your fingerprint.</h1>
+          <p class="lede">Add an account once and its codes are on the web, your Mac or Windows PC, your phone and a Chrome side panel. Each app stays locked until Touch&nbsp;ID, Face&nbsp;ID or your fingerprint says it's you.</p>
+          <div class="ctas">
+            <a class="btn solid" href="https://authenticator.sz4h.com">Open the web app</a>
+            <a class="btn" href="#download">Get the apps</a>
+          </div>
+        </div>
+        <div class="device" role="img" aria-label="Three example accounts with live six-digit codes counting down">
+          <div class="bar">
+            <div class="search">Search</div>
+            <div class="lockdot"><img src="assets/icons/fingerprint.svg" alt="" width="20" height="20" style="filter: invert(.7)" /></div>
+          </div>
+          <div id="codes"></div>
+          <p class="note">Live demo codes, made in your browser from sample keys.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" id="download" aria-labelledby="dl-title">
+      <div class="wrap">
+        <h2 id="dl-title">One account, every place you sign in</h2>
+        <p class="sub">Your codes sync through your account, so a code you add on your phone shows up in Chrome a second later.</p>
+        <div class="platforms">
+          <div class="platform">
+            <h3><img src="assets/icons/web.svg" alt="" />Web</h3>
+            <p>Works in any browser. Install it from Chrome's address bar to get its own window.</p>
+            <div class="links"><a href="https://authenticator.sz4h.com">Open web app</a></div>
+          </div>
+          <div class="platform">
+            <h3><img src="assets/icons/laptop.svg" alt="" />Mac</h3>
+            <p>Unlocks with Touch&nbsp;ID. Hides itself from screenshots and screen sharing.</p>
+            <div class="links">
+              <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-arm64.dmg">Apple silicon</a>
+              <a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-x64.dmg">Intel</a>
+            </div>
+          </div>
+          <div class="platform">
+            <h3><img src="assets/icons/monitor.svg" alt="" />Windows</h3>
+            <p>Unlocks with your account password. Lives in the system tray.</p>
+            <div class="links"><a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-windows-setup.exe">Download installer</a></div>
+          </div>
+          <div class="platform">
+            <h3><img src="assets/icons/extension.svg" alt="" />Chrome</h3>
+            <p>A side panel next to the page you're signing in to. Press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>2</kbd> and the right code is already filtered.</p>
+            <div class="links"><a href="https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-chrome-extension.zip">Download extension</a><a href="docs/guide.html#chrome">How to install</a></div>
+          </div>
+          <div class="platform">
+            <h3><img src="assets/icons/phone.svg" alt="" />iPhone &amp; Android <span class="soon-tag">Coming soon</span></h3>
+            <p>Face&nbsp;ID or fingerprint, camera QR scanning, and a privacy cover in the app switcher.</p>
+            <div class="links"><a href="docs/self-hosting.html#mobile">Build it yourself</a></div>
+          </div>
+          <div class="platform">
+            <h3><img src="assets/icons/server.svg" alt="" />Your own server</h3>
+            <p>Run the whole thing on your own machine with Docker in a few minutes.</p>
+            <div class="links"><a href="docs/self-hosting.html">Self-hosting guide</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="shots-title">
+      <div class="wrap">
+        <h2 id="shots-title">Quiet by design</h2>
+        <p class="sub">A search box and your codes. Click a code to copy it; the ring shows how long it has left.</p>
+        <div class="shots">
+          <figure class="shot"><img src="assets/shots/web-dark.png" alt="The vault in the web app: a list of accounts with six-digit codes" loading="lazy" /><figcaption>The vault on the web and desktop apps.</figcaption></figure>
+          <figure class="shot"><img src="assets/shots/extension.png" alt="The Chrome side panel showing the same accounts" loading="lazy" /><figcaption>The Chrome side panel.</figcaption></figure>
+          <figure class="shot"><img src="assets/shots/lock.png" alt="The lock screen asking for Touch ID" loading="lazy" /><figcaption>Locked until you unlock.</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" aria-labelledby="sec-title">
+      <div class="wrap">
+        <h2 id="sec-title">What happens to your secrets</h2>
+        <p class="sub">The setup key behind each code is the thing worth stealing, so it never leaves the server.</p>
+        <div class="facts">
+          <div class="fact"><img src="assets/icons/lock.svg" alt="" /><h3>Encrypted at rest</h3><p>Each setup key is sealed with AES-256-GCM before it reaches the database, using a key that lives only in the server's settings.</p></div>
+          <div class="fact"><img src="assets/icons/server.svg" alt="" /><h3>Codes are made on the server</h3><p>Your devices receive the six digits and nothing else. A lost laptop or phone holds no setup keys.</p></div>
+          <div class="fact"><img src="assets/icons/fingerprint.svg" alt="" /><h3>Locked until you prove it's you</h3><p>The apps lock every time they start and again after an hour, or sooner if you choose. Codes stay hidden until you unlock.</p></div>
+          <div class="fact"><img src="assets/icons/key.svg" alt="" /><h3>Your own account has 2FA too</h3><p>Protect your sign-in with a code from any authenticator, with ten one-time recovery codes as a backup.</p></div>
+        </div>
+        <div class="tradeoff"><p><strong>The trade-off:</strong> because codes are made on the server, you need a connection to see them. If you need codes on a plane with no Wi-Fi, keep a second authenticator for your most important accounts.</p></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="more-title">
+      <div class="wrap split">
+        <div>
+          <img src="assets/icons/users.svg" alt="" />
+          <h2 id="more-title">Share with family or your team</h2>
+          <p class="sub" style="margin-bottom:0">Invite people to your account and pick which codes each person can see. Shared codes are read-only, and everyone keeps their own private codes alongside.</p>
+        </div>
+        <div>
+          <img src="assets/icons/import.svg" alt="" />
+          <h2>Bring your codes with you</h2>
+          <p class="sub" style="margin-bottom:0">Import everything in one go from:</p>
+          <ul class="chips">
+            <li>Google Authenticator</li><li>Aegis</li><li>2FAS</li><li>Proton Authenticator</li><li>otpauth:// links</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt" aria-labelledby="host-title">
+      <div class="wrap">
+        <img src="assets/icons/terminal.svg" alt="" />
+        <h2 id="host-title">Run your own server</h2>
+        <p class="sub">The server is one Docker Compose file: the API, the web app and MongoDB.</p>
+        <ol class="steps">
+          <li><h3>Get the code</h3><pre><code>git clone https://github.com/Mello21century/authenticator.git
+cd authenticator</code></pre></li>
+          <li><h3>Create two secrets</h3><pre><code>cp .env.example .env
+openssl rand -base64 48   <span class="c"># JWT_SECRET</span>
+openssl rand -base64 32   <span class="c"># VAULT_MASTER_KEY, back this one up</span></code></pre></li>
+          <li><h3>Start it</h3><pre><code>docker network create dokploy-network
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build</code></pre><p>Open <code>http://localhost:8080</code> and create your account. The <a href="docs/self-hosting.html">self-hosting guide</a> covers domains, email and backups.</p></li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Space Authenticator by sz4h. Source-available: you can read the code and run unmodified copies; changes need approval. <a href="https://github.com/Mello21century/authenticator/blob/main/LICENSE">License</a></span>
+      <nav aria-label="Footer">
+        <a href="docs/guide.html">User guide</a>
+        <a href="docs/self-hosting.html">Self-host</a>
+        <a href="https://github.com/Mello21century/authenticator/security">Report a security issue</a>
+        <a href="https://github.com/Mello21century/authenticator/releases">Releases</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="assets/live-codes.js" type="module"></script>
+</body>
+</html>

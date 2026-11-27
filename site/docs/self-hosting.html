@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Self-host and build from source · Space Authenticator</title>
+  <meta name="description" content="Run your own Space Authenticator server with Docker, and build the web, desktop, Chrome and mobile apps from source." />
+  <link rel="icon" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="../"><img src="../assets/logo.png" alt="" />Space Authenticator</a>
+      <nav aria-label="Main">
+        <a class="hide-sm" href="guide.html">User guide</a>
+        <a href="self-hosting.html" aria-current="page">Self-host</a>
+        <a class="hide-sm" href="https://github.com/Mello21century/authenticator">GitHub</a>
+        <a class="btn" href="../#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap doc">
+    <aside>
+      <p>On this page</p>
+      <ol>
+        <li><a href="#overview">What you're running</a></li>
+        <li><a href="#local">Try it on your computer</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#dokploy">Deploy with Dokploy</a></li>
+        <li><a href="#other">Deploy anywhere else</a></li>
+        <li><a href="#backup">Backups</a></li>
+        <li><a href="#source">Build from source</a></li>
+        <li><a href="#desktop">Desktop apps</a></li>
+        <li><a href="#extension">Chrome extension</a></li>
+        <li><a href="#mobile">Mobile apps</a></li>
+        <li><a href="#release">Releases</a></li>
+        <li><a href="#license">License</a></li>
+      </ol>
+    </aside>
+    <article>
+      <h1>Self-host and build from source</h1>
+      <p>Run your own server with Docker, then point the apps at it, or build every app yourself.</p>
+
+      <h2 id="overview">What you're running</h2>
+      <table>
+        <thead><tr><th>Service</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>web</code></td><td>nginx serving the web app, and passing <code>/api</code> to the API. The only service that needs a public port.</td></tr>
+          <tr><td><code>api</code></td><td>NestJS API: accounts, encrypted setup keys, code generation, email.</td></tr>
+          <tr><td><code>mongo</code></td><td>MongoDB 7 with a named volume. Never exposed.</td></tr>
+        </tbody>
+      </table>
+      <p>You need Docker with Compose, and for a real deployment a domain name and a <a href="https://resend.com">Resend</a> account for password-reset and invite emails.</p>
+
+      <h2 id="local">Try it on your computer</h2>
+<pre><code>git clone https://github.com/Mello21century/authenticator.git
+cd authenticator
+cp .env.example .env</code></pre>
+      <p>Open <code>.env</code> and set the two secrets:</p>
+<pre><code>openssl rand -base64 48   <span class="c"># paste as JWT_SECRET</span>
+openssl rand -base64 32   <span class="c"># paste as VAULT_MASTER_KEY</span></code></pre>
+      <p>Then start it:</p>
+<pre><code>docker network create dokploy-network   <span class="c"># once</span>
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build</code></pre>
+      <p>Open <code>http://localhost:8080</code> and create your account.</p>
+
+      <h2 id="settings">Settings</h2>
+      <p>All settings are environment variables, read from <code>.env</code> next to <code>docker-compose.yml</code>.</p>
+      <table>
+        <thead><tr><th>Variable</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>VAULT_MASTER_KEY</code></td><td>32 random bytes, base64. Encrypts every setup key. <b>Losing it loses every account; changing it makes existing accounts unreadable.</b></td></tr>
+          <tr><td><code>JWT_SECRET</code></td><td>At least 32 characters. Signs sign-in sessions. Changing it signs everyone out.</td></tr>
+          <tr><td><code>RESEND_API_KEY</code></td><td>Your Resend API key, for password-reset and invite emails.</td></tr>
+          <tr><td><code>MAIL_FROM</code></td><td>Sender, e.g. <code>Space Authenticator &lt;auth@your-domain&gt;</code>. The domain must be verified in Resend.</td></tr>
+          <tr><td><code>APP_URL</code></td><td>Public address of the web app, used in email links, e.g. <code>https://auth.your-domain</code>.</td></tr>
+          <tr><td><code>SIGNUP_ENABLED</code></td><td><code>true</code> lets anyone create an account. Set <code>false</code> once your people have joined; owners can still invite members.</td></tr>
+          <tr><td><code>CORS_ORIGINS</code></td><td>Extra app origins allowed to call the API, comma separated. Keep <code>app://authenticator</code> for the desktop app and add <code>chrome-extension://&lt;id&gt;</code> for the Chrome extension.</td></tr>
+          <tr><td><code>TRUST_PROXY_HOPS</code></td><td>How many reverse proxies sit in front of the API, so rate limits see the real client address. <code>2</code> behind Traefik + the bundled nginx, <code>1</code> when the web container is reached directly.</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="dokploy">Deploy with Dokploy</h2>
+      <ol class="steps">
+        <li><h3>Create the service</h3><p>In Dokploy, create a <b>Compose</b> service from this repository, branch <code>main</code>, compose path <code>./docker-compose.yml</code>.</p></li>
+        <li><h3>Add the environment</h3><p>Paste the variables from <a href="#settings">Settings</a> into the service's Environment tab.</p></li>
+        <li><h3>Add your domain</h3><p>Domains → your domain → service <b>web</b>, port <b>80</b>, HTTPS on with Let's Encrypt.</p></li>
+        <li><h3>Deploy</h3><p>Turn on auto-deploy to redeploy on every push to <code>main</code>.</p></li>
+      </ol>
+      <div class="callout">The <code>web</code> service joins Dokploy's shared <code>dokploy-network</code>. The API is reached by the alias <code>authenticator-api</code>, so it can't collide with another project's service called <code>api</code> on the same network.</div>
+
+      <h2 id="other">Deploy anywhere else</h2>
+      <p>Any host with Docker works. Put your HTTPS reverse proxy (Caddy, Traefik, nginx) in front of the <code>web</code> container's port 80, publish nothing else, and set <code>TRUST_PROXY_HOPS</code> to the number of proxies plus one for the bundled nginx. If you don't use Dokploy, either create the <code>dokploy-network</code> network or remove it from <code>docker-compose.yml</code>.</p>
+
+      <h2 id="backup">Backups</h2>
+      <p>Back up two things, and keep them apart:</p>
+      <ul>
+        <li><b>The database:</b> <code>docker compose exec mongo mongodump --archive &gt; backup.archive</code></li>
+        <li><b><code>VAULT_MASTER_KEY</code>:</b> in your password manager. The database is useless without it, and a stolen database is useless without it too.</li>
+      </ul>
+
+      <h2 id="source">Build from source</h2>
+      <p>You need Node.js 24 and pnpm 11. The repository is a pnpm workspace:</p>
+      <table>
+        <tbody>
+          <tr><td><code>apps/api</code></td><td>NestJS + Fastify + MongoDB</td></tr>
+          <tr><td><code>apps/web</code></td><td>Vite + React; also the desktop and Chrome UI</td></tr>
+          <tr><td><code>apps/desktop</code></td><td>Electron</td></tr>
+          <tr><td><code>apps/extension</code></td><td>Chrome side panel (Manifest V3)</td></tr>
+          <tr><td><code>apps/mobile</code></td><td>Expo / React Native</td></tr>
+          <tr><td><code>packages/shared</code></td><td>API client, types, importers, design tokens</td></tr>
+        </tbody>
+      </table>
+<pre><code>pnpm install
+pnpm test                    <span class="c"># all tests; the API tests start an in-memory MongoDB</span>
+pnpm --filter api dev        <span class="c"># API on :3000, reads ../../.env</span>
+pnpm --filter web dev        <span class="c"># web app on :5173, /api proxied to :3000</span></code></pre>
+
+      <h2 id="desktop">Desktop apps</h2>
+<pre><code>pnpm --filter desktop dev    <span class="c"># opens the app against http://localhost:8080/api</span>
+pnpm --filter desktop dist   <span class="c"># installers in apps/desktop/release</span></code></pre>
+      <p>Packaged builds connect to <code>https://authenticator.sz4h.com/api</code>; set <code>AUTH_API_URL</code> when building to change the default. A Mac signs the build automatically if a Developer ID certificate is in its keychain. Windows installers can be built on a Mac.</p>
+
+      <h2 id="extension">Chrome extension</h2>
+<pre><code>pnpm --filter extension build   <span class="c"># unpacked extension in apps/extension/dist</span></code></pre>
+      <p>Load <code>apps/extension/dist</code> from <code>chrome://extensions</code> with Developer mode on. To use it with your own server, add <code>chrome-extension://dgmbchpaamaioijdcifhfjbbpkgkdadl</code> (the extension's fixed ID) to <code>CORS_ORIGINS</code> on the server, then enter the server's address under <b>Server</b> on the extension's sign-in screen.</p>
+
+      <h2 id="mobile">Mobile apps</h2>
+<pre><code>cd apps/mobile
+EXPO_PUBLIC_API_URL=https://auth.your-domain/api npx expo run:ios       <span class="c"># needs Xcode</span>
+EXPO_PUBLIC_API_URL=https://auth.your-domain/api npx expo run:android   <span class="c"># needs Android Studio and JDK 17+</span></code></pre>
+      <p>Face ID and fingerprint need a development build; they don't work in Expo Go. Store builds use EAS: <code>npx eas-cli build -p all --profile production</code>.</p>
+
+      <h2 id="release">Releases</h2>
+      <p>Pushing a tag such as <code>v0.2.0</code> runs the release workflow on GitHub Actions: it builds the Mac DMGs, the Windows installer and the extension zips, and attaches them to a GitHub Release. Mac signing and notarization turn on when the signing secrets described in <code>.github/workflows/release.yml</code> are present.</p>
+
+      <h2 id="license">License</h2>
+      <p>Space Authenticator is source-available, not open source. You may read the code and build and run <b>unmodified</b> copies for your own use, including your own server. Modifying, redistributing or hosting it for others needs written approval. See the <a href="https://github.com/Mello21century/authenticator/blob/main/LICENSE">license</a>.</p>
+    </article>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <span>Space Authenticator by sz4h. <a href="https://github.com/Mello21century/authenticator/blob/main/LICENSE">License</a></span>
+      <nav aria-label="Footer"><a href="../">Home</a><a href="guide.html">User guide</a><a href="https://github.com/Mello21century/authenticator/issues">Report a problem</a></nav>
+    </div>
+  </footer>
+</body>
+</html>
