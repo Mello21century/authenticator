@@ -16,7 +16,7 @@ export async function makeApp(overrides: Partial<AppConfig> = {}) {
   mongo ??= await MongoMemoryServer.create();
   const cfg: AppConfig = {
     port: 0, mongoUrl: mongo.getUri(`t${randomBytes(6).toString('hex')}`), jwtSecret: 'x'.repeat(40), vaultKey: randomBytes(32),
-    resendApiKey: 're_test', mailFrom: 'test@example.com', appUrl: 'https://app.test', signupEnabled: true, corsOrigins: [], trustProxyHops: 0,
+    resendApiKey: 're_test', mailFrom: 'test@example.com', appUrl: 'https://app.test', signupEnabled: true, corsOrigins: [], trustProxyHops: 0, minAppVersion: '0.0.0', iosStoreUrl: '', androidStoreUrl: '',
     disableThrottle: true, ...overrides,
   };
   const mail = { sent: [] as SentMail[] };

@@ -1,4 +1,4 @@
-import type { AuthResponse, CodesResponse, Entry, EntryInput, ExportFile, Member, MfaRequired, User } from './types';
+import type { AppVersionInfo, AuthResponse, CodesResponse, Entry, EntryInput, ExportFile, Member, MfaRequired, User } from './types';
 
 export interface ApiOptions {
   baseUrl: string; // ends with /api
@@ -84,6 +84,8 @@ export function createApi(o: ApiOptions) {
       }
     },
     me: () => call<User>('GET', '/auth/me'),
+    /** Public: minimum app version and store links, for the mobile force-update check. */
+    appVersion: () => raw<AppVersionInfo>('GET', '/app/version', undefined, false),
     forgotPassword: (email: string) => raw<void>('POST', '/auth/password/forgot', { email }, false),
     resetPassword: (token: string, password: string) => raw<void>('POST', '/auth/password/reset', { token, password }, false),
     verifyPassword: (password: string) => call<void>('POST', '/auth/password/verify', { password }),

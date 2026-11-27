@@ -25,4 +25,9 @@ describe('loadConfig', () => {
     expect(c.signupEnabled).toBe(false);
     expect(c.corsOrigins).toEqual(['app://authenticator', 'http://localhost:5173']);
   });
+  it('MIN_APP_VERSION defaults to 0.0.0 and rejects typos', () => {
+    expect(loadConfig(good).minAppVersion).toBe('0.0.0');
+    expect(loadConfig({ ...good, MIN_APP_VERSION: '1.2.0' }).minAppVersion).toBe('1.2.0');
+    expect(() => loadConfig({ ...good, MIN_APP_VERSION: 'v1.2' })).toThrow(/MIN_APP_VERSION/);
+  });
 });

@@ -75,6 +75,8 @@ Side panel with the same vault UI, locked behind Touch ID / Windows Hello (WebAu
 
 ## <img src="site/assets/icons/phone.svg" width="22" align="top" alt="" /> Mobile (Expo)
 
+**Force update:** set `MIN_APP_VERSION` (and `IOS_STORE_URL` / `ANDROID_STORE_URL`) on the API. Apps below that `version` (from `apps/mobile/app.json`) show a blocking "Update required" screen, checked on launch and on every return to the foreground.
+
 ```sh
 cd apps/mobile
 npx expo run:ios            # simulator dev build (Face ID: Simulator > Features > Face ID > Enrolled)

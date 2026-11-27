@@ -78,6 +78,8 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build</
           <tr><td><code>APP_URL</code></td><td>Public address of the web app, used in email links, e.g. <code>https://auth.your-domain</code>.</td></tr>
           <tr><td><code>SIGNUP_ENABLED</code></td><td><code>true</code> lets anyone create an account. Set <code>false</code> once your people have joined; owners can still invite members.</td></tr>
           <tr><td><code>CORS_ORIGINS</code></td><td>Extra app origins allowed to call the API, comma separated. Keep <code>app://authenticator</code> for the desktop app and add <code>chrome-extension://&lt;id&gt;</code> for the Chrome extension.</td></tr>
+          <tr><td><code>MIN_APP_VERSION</code></td><td>Optional. iPhone and Android apps older than this version (e.g. <code>1.2.0</code>) show an "Update required" screen and can't be used until updated. Leave empty to never force updates.</td></tr>
+          <tr><td><code>IOS_STORE_URL</code>, <code>ANDROID_STORE_URL</code></td><td>Where the "Update now" button sends people. Android falls back to the Play Store listing for <code>com.sz4h.authenticator</code>.</td></tr>
           <tr><td><code>TRUST_PROXY_HOPS</code></td><td>How many reverse proxies sit in front of the API, so rate limits see the real client address. <code>2</code> behind Traefik + the bundled nginx, <code>1</code> when the web container is reached directly.</td></tr>
         </tbody>
       </table>
@@ -132,6 +134,9 @@ pnpm --filter desktop dist   <span class="c"># installers in apps/desktop/releas
 EXPO_PUBLIC_API_URL=https://auth.your-domain/api npx expo run:ios       <span class="c"># needs Xcode</span>
 EXPO_PUBLIC_API_URL=https://auth.your-domain/api npx expo run:android   <span class="c"># needs Android Studio and JDK 17+</span></code></pre>
       <p>Face ID and fingerprint need a development build; they don't work in Expo Go. Store builds use EAS: <code>npx eas-cli build -p all --profile production</code>.</p>
+
+      <h3>Forcing a mobile update</h3>
+      <p>Bump <code>version</code> in <code>apps/mobile/app.json</code> for each store release. Once the new version is live in both stores, set <code>MIN_APP_VERSION</code> to it on the server and redeploy. Older apps check on launch and whenever they return to the foreground; they never block when the server can't be reached.</p>
 
       <h2 id="release">Releases</h2>
       <p>Pushing a tag such as <code>v0.2.0</code> runs the release workflow on GitHub Actions: it builds the Mac DMGs, the Windows installer and the extension zips, and attaches them to a GitHub Release. Mac signing and notarization turn on when the signing secrets described in <code>.github/workflows/release.yml</code> are present.</p>

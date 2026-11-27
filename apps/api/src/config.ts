@@ -10,6 +10,10 @@ export interface AppConfig {
   corsOrigins: string[];
   /** number of reverse proxies in front of the api (Traefik + nginx = 2) */
   trustProxyHops: number;
+  /** mobile apps below this version are told to update (MIN_APP_VERSION) */
+  minAppVersion: string;
+  iosStoreUrl: string;
+  androidStoreUrl: string;
   /** test-only: never read from env */
   disableThrottle?: boolean;
 }
@@ -36,11 +40,15 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
   if (!Number.isInteger(port) || port <= 0) errors.push('PORT must be a positive integer');
   const trustProxyHops = Number(env.TRUST_PROXY_HOPS ?? 2);
   if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0) errors.push('TRUST_PROXY_HOPS must be a non-negative integer');
+  if (env.MIN_APP_VERSION?.trim() && !/^\d+(\.\d+)*$/.test(env.MIN_APP_VERSION.trim())) errors.push('MIN_APP_VERSION must look like 1.2.0');
   if (errors.length) throw new Error(`Invalid configuration:\n- ${errors.join('\n- ')}`);
   return {
     port, mongoUrl, jwtSecret, vaultKey, resendApiKey, mailFrom, appUrl,
     signupEnabled: (env.SIGNUP_ENABLED ?? 'true').toLowerCase() !== 'false',
     trustProxyHops,
+    minAppVersion: env.MIN_APP_VERSION?.trim() || '0.0.0',
+    iosStoreUrl: env.IOS_STORE_URL?.trim() ?? '',
+    androidStoreUrl: env.ANDROID_STORE_URL?.trim() ?? '',
     corsOrigins: (env.CORS_ORIGINS ?? '').split(',').map(s => s.trim()).filter(Boolean),
   };
 }

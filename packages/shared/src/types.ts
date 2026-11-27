@@ -31,3 +31,10 @@ export interface AuthResponse { accessToken: string; refreshToken?: string; user
 export interface MfaRequired { mfaRequired: true; mfaToken: string }
 export interface Member { id: string; email: string; activated: boolean; createdAt: string }
 export interface ExportFile { version: 1; exportedAt: string; entries: (EntryInput & { uri: string })[] }
+
+export interface AppVersionInfo {
+  /** apps below this version must update before they can be used */
+  minVersion: string;
+  iosUrl: string;
+  androidUrl: string;
+}

@@ -1,4 +1,4 @@
-import { Controller, Get, Global, Module, type DynamicModule } from '@nestjs/common';
+import { Controller, Get, Global, Inject, Module, type DynamicModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -13,6 +13,15 @@ import { VaultModule } from './vault/vault.module';
 @Controller('health')
 class HealthController {
   @Get() health() { return { ok: true }; }
+}
+
+/** Public: lets mobile apps block themselves until the user installs a supported version. */
+@Controller('app')
+class AppVersionController {
+  constructor(@Inject(CONFIG) private readonly cfg: AppConfig) {}
+  @Get('version') version() {
+    return { minVersion: this.cfg.minAppVersion, iosUrl: this.cfg.iosStoreUrl, androidUrl: this.cfg.androidStoreUrl };
+  }
 }
 
 @Global()
@@ -45,7 +54,7 @@ export class AppModule {
         VaultModule,
         ThrottlerModule.forRoot({ throttlers: [{ ttl: 60_000, limit: 100 }], skipIf: () => !!cfg.disableThrottle }),
       ],
-      controllers: [HealthController],
+      controllers: [HealthController, AppVersionController],
       providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
     };
   }

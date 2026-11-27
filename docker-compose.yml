@@ -19,6 +19,9 @@ services:
       - SIGNUP_ENABLED=${SIGNUP_ENABLED:-true}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - TRUST_PROXY_HOPS=${TRUST_PROXY_HOPS:-2}
+      - MIN_APP_VERSION=${MIN_APP_VERSION:-}
+      - IOS_STORE_URL=${IOS_STORE_URL:-}
+      - ANDROID_STORE_URL=${ANDROID_STORE_URL:-}
     depends_on:
       - mongo
     networks:

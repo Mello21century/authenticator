@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@auth/shared": "workspace:*",
     "@tanstack/react-query": "^5.108.4",
     "expo": "~58.1.0",
     "expo-camera": "~58.0.14",
     "expo-clipboard": "~58.0.4",
+    "expo-constants": "~58.0.16",
     "expo-dev-client": "~58.0.22",
     "expo-haptics": "~58.0.8",
     "expo-local-authentication": "~58.0.3",
@@ -14,8 +16,7 @@
     "expo-status-bar": "~58.0.5",
     "react": "19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "~5.11.1",
-    "@auth/shared": "workspace:*"
+    "react-native-safe-area-context": "~5.11.1"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

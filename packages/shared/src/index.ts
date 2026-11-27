@@ -7,3 +7,4 @@ export * from './importers';
 export * from './api';
 export * from './codes';
 export * from './lock';
+export * from './version';
