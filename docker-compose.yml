@@ -22,7 +22,9 @@ services:
     depends_on:
       - mongo
     networks:
-      - default
+      default:
+        aliases:
+          - authenticator-api
 
   web:
     build:
