@@ -9,7 +9,7 @@ function Shell({ title, sub, children }: { title: string; sub?: string; children
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <div className="brand"><div className="brand-mark">◈</div><h1>Space Authenticator</h1></div>
+        <div className="brand"><img className="brand-mark" src="./logo.png" alt="" /><h1>Space Authenticator</h1></div>
         <div><h2>{title}</h2>{sub && <p className="muted" style={{ margin: '4px 0 0' }}>{sub}</p>}</div>
         {children}
       </div>
