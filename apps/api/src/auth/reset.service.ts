@@ -49,15 +49,15 @@ export class ResetService {
     if (!u) return;
     const link = this.link(await this.createToken(u._id, 'reset'), 'reset');
     // not awaited: response time must not reveal whether the account exists
-    this.mail.send(u.email, 'Reset your Authenticator password',
+    this.mail.send(u.email, 'Reset your Space Authenticator password',
       `Someone asked to reset the password for ${u.email}.\n\nOpen this link within 30 minutes to choose a new password:\n${link}\n\nIf this wasn't you, ignore this email.`,
     ).catch(e => this.log.error(e));
   }
 
   async invite(userId: Types.ObjectId, email: string, ownerEmail: string): Promise<void> {
     const link = this.link(await this.createToken(userId, 'invite'), 'invite');
-    await this.mail.send(email, `${ownerEmail} invited you to Authenticator`,
-      `${ownerEmail} added you to their Authenticator account.\n\nSet your password within 72 hours to get started:\n${link}`);
+    await this.mail.send(email, `${ownerEmail} invited you to Space Authenticator`,
+      `${ownerEmail} added you to their Space Authenticator account.\n\nSet your password within 72 hours to get started:\n${link}`);
   }
 
   async reset(token: string, password: string): Promise<void> {

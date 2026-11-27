@@ -40,7 +40,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if ((await LocalAuthentication.getEnrolledLevelAsync()) === LocalAuthentication.SecurityLevel.NONE) {
       lock.unlock(); setLocked(false); return;
     }
-    const r = await LocalAuthentication.authenticateAsync({ promptMessage: 'Unlock Authenticator' });
+    const r = await LocalAuthentication.authenticateAsync({ promptMessage: 'Unlock Space Authenticator' });
     if (r.success) { lock.unlock(); setLocked(false); }
     else if (r.error !== 'user_cancel' && r.error !== 'app_cancel' && r.error !== 'system_cancel') setLockError(`Couldn't unlock (${r.error}).`);
   }, [lock]);

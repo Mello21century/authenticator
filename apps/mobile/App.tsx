@@ -38,7 +38,7 @@ function Root() {
       {(locked || covered) && (
         <View style={{ position: 'absolute', inset: 0, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 }}>
           <View style={{ width: 68, height: 68, borderRadius: 22, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}><T size={30}>🔒</T></View>
-          <T size={18} weight="600">Authenticator is locked</T>
+          <T size={18} weight="600">Space Authenticator is locked</T>
           {locked && !covered && <Btn kind="primary" title="Unlock" onPress={unlock} style={{ alignSelf: 'stretch' }} />}
           {!!lockError && <T style={{ color: c.danger, textAlign: 'center' }}>{lockError}</T>}
           {locked && !covered && <Btn title="Sign out" onPress={signOut} style={{ alignSelf: 'stretch' }} />}

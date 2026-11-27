@@ -21,7 +21,7 @@ export class MfaService {
     if (u.mfa?.enabled) throw new ConflictException('Two-factor login is already enabled');
     const secret = base32Encode(randomBytes(20));
     await this.users.model.updateOne({ _id: u._id }, { mfa: { secret: this.cipher.seal(secret), enabled: false, recoveryHashes: [] } });
-    const otpauthUri = `otpauth://totp/Authenticator:${encodeURIComponent(u.email)}?secret=${secret}&issuer=Authenticator`;
+    const otpauthUri = `otpauth://totp/Space%20Authenticator:${encodeURIComponent(u.email)}?secret=${secret}&issuer=Space%20Authenticator`;
     return { secret, otpauthUri };
   }
 

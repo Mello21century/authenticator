@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Entry, EntryInput } from '@auth/shared';
@@ -14,6 +14,13 @@ export default function Vault({ locked }: { locked: boolean }) {
   const qc = useQueryClient();
   const toast = useToast();
   const [q, setQ] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  // focus search whenever the window comes to the front, unless the user is typing elsewhere
+  useEffect(() => {
+    const f = () => { const a = document.activeElement; if (!a || a === document.body) searchRef.current?.focus(); };
+    window.addEventListener('focus', f);
+    return () => window.removeEventListener('focus', f);
+  }, []);
   const [form, setForm] = useState<{ editing?: Entry } | null>(null);
   const [sharing, setSharing] = useState<Entry | null>(null);
   const entries = useQuery({ queryKey: ['entries'], queryFn: api.listEntries });
@@ -51,7 +58,7 @@ export default function Vault({ locked }: { locked: boolean }) {
   return (
     <div className="shell">
       <div className="topbar">
-        <div className="search"><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" aria-label="Search accounts" /></div>
+        <div className="search"><input ref={searchRef} autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Search" aria-label="Search accounts" /></div>
         <Link to="/settings" className="icon-btn" aria-label="Settings" style={{ fontSize: 20 }}>⚙</Link>
       </div>
 

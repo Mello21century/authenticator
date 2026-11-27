@@ -1,5 +1,5 @@
 appId: com.sz4h.authenticator
-productName: Authenticator
+productName: Space Authenticator
 directories:
   output: release
 files:

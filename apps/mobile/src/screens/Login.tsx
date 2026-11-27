@@ -40,7 +40,7 @@ export default function Login() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24, gap: 16 }} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}><T weight="700" style={{ color: c.accentText }}>◈</T></View>
-          <T size={22} weight="700">Authenticator</T>
+          <T size={22} weight="700">Space Authenticator</T>
         </View>
         <T size={18} weight="600">{title}</T>
         {mode === 'mfa' ? (

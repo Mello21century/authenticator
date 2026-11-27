@@ -130,7 +130,7 @@ function ImportExport() {
         try {
           const f = await api.exportVault(password, code.trim() || undefined);
           setPassword(''); setCode('');
-          await Share.share({ message: JSON.stringify(f, null, 2), title: 'Authenticator export' });
+          await Share.share({ message: JSON.stringify(f, null, 2), title: 'Space Authenticator export' });
         } catch (e) { setErr(errMsg(e)); }
       }} />
       <T muted size={13}>The export contains your secrets in plain text.</T>
