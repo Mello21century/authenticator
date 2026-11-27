@@ -34,7 +34,7 @@ function checkLock() { if (lock.check()) emitLock(); }
 function createWindow() {
   win = new BrowserWindow({
     width: 440, height: 760, minWidth: 360, minHeight: 520, show: false,
-    backgroundColor: '#0f0e15', title: 'Space Authenticator',
+    backgroundColor: '#0e1116', title: 'Space Authenticator',
     webPreferences: { preload: join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
   win.setContentProtection(true); // keep codes out of screenshots / screen sharing
