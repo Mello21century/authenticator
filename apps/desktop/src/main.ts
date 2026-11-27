@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { LockState } from './lock';
 
 const APP_ORIGIN = 'app://authenticator';
-const DEFAULT_API = process.env.AUTH_API_URL ?? 'http://localhost:8080/api';
+const DEFAULT_API = process.env.AUTH_API_URL ?? (app.isPackaged ? 'https://authenticator.sz4h.com/api' : 'http://localhost:8080/api');
 const HOUR = 3_600_000;
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
