@@ -12,8 +12,24 @@ function Shell({ title, sub, children }: { title: string; sub?: string; children
         <div className="brand"><img className="brand-mark" src="./logo.png" alt="" /><h1>Space Authenticator</h1></div>
         <div><h2>{title}</h2>{sub && <p className="muted" style={{ margin: '4px 0 0' }}>{sub}</p>}</div>
         {children}
+        {!desktop && <GetApps />}
       </div>
     </div>
+  );
+}
+
+const DL = 'https://github.com/Mello21century/authenticator/releases/latest/download/';
+
+/** Download links for the native apps (hidden inside the desktop app / extension). */
+function GetApps() {
+  return (
+    <p className="muted get-apps">
+      Get the apps:{' '}
+      <a href={DL + 'Space-Authenticator-mac-arm64.dmg'}>Mac (Apple silicon)</a> ·{' '}
+      <a href={DL + 'Space-Authenticator-mac-x64.dmg'}>Mac (Intel)</a> ·{' '}
+      <a href={DL + 'Space-Authenticator-windows-setup.exe'}>Windows</a> ·{' '}
+      <a href={DL + 'Space-Authenticator-chrome-extension.zip'}>Chrome extension</a>
+    </p>
   );
 }
 

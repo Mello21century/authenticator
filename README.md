@@ -1,4 +1,20 @@
-# Authenticator
+# Space Authenticator
+
+Your 2FA codes, synced across web, desktop, mobile and a Chrome side panel, locked behind Touch ID / Face ID / fingerprint.
+
+**Use it:** https://authenticator.sz4h.com
+
+**Download:**
+[Mac (Apple silicon)](https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-arm64.dmg) ·
+[Mac (Intel)](https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-mac-x64.dmg) ·
+[Windows](https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-windows-setup.exe) ·
+[Chrome extension](https://github.com/Mello21century/authenticator/releases/latest/download/Space-Authenticator-chrome-extension.zip)
+(unzip, then chrome://extensions -> Developer mode -> Load unpacked) ·
+[All releases](https://github.com/Mello21century/authenticator/releases)
+
+**License:** source-available, not open source. You may read the code, use the official apps and run unmodified copies; modifying or redistributing it needs the owner's written approval. See [LICENSE](LICENSE).
+
+## How it works
 
 Self-hosted 2FA authenticator: NestJS API (codes generated server-side, secrets AES-256-GCM encrypted in MongoDB), React web app, Electron desktop app, Expo mobile app.
 

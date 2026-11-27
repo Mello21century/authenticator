@@ -1,0 +1,38 @@
+Space Authenticator Source-Available License
+
+Copyright (c) 2026 sz4h. All rights reserved.
+
+This repository is published so that anyone can read the source code and
+download the official apps. It is NOT open source.
+
+1. You MAY, free of charge:
+   a. view and read the source code in this repository;
+   b. download, install and use the official release builds published by the
+      copyright holder (GitHub Releases, app stores, Chrome Web Store);
+   c. build and run UNMODIFIED copies of this software for your own personal or
+      internal use, including running your own server.
+
+2. You may NOT, without prior written approval from the copyright holder:
+   a. modify the source code or create derivative works of it;
+   b. distribute, publish, sublicense or sell this software or any part of it,
+      modified or unmodified (apart from linking to the official releases);
+   c. offer this software, modified or unmodified, as a hosted service to
+      third parties;
+   d. remove or alter this license or any copyright notice.
+
+3. Contributions. Opening an issue or pull request does not grant any rights.
+   A change becomes part of this software only when the copyright holder
+   approves and merges it. By submitting a contribution you grant the copyright
+   holder a perpetual, irrevocable, worldwide, royalty-free license to use,
+   modify and relicense it as part of this software.
+
+4. Approval requests: open an issue in this repository or contact the
+   copyright holder via https://sz4h.com.
+
+5. No warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+   EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+Any use not expressly permitted above is reserved by the copyright holder.

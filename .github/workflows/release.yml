@@ -78,10 +78,10 @@ jobs:
       - name: Zip
         run: |
           mkdir -p out
-          (cd apps/extension/dist && zip -qr ../../../out/space-authenticator-extension.zip .)
+          (cd apps/extension/dist && zip -qr ../../../out/Space-Authenticator-chrome-extension.zip .)
           # Chrome Web Store rejects the "key" field; the store assigns its own ID
           node -e "const f='apps/extension/dist/manifest.json',m=require('./'+f);delete m.key;require('fs').writeFileSync(f,JSON.stringify(m,null,2))"
-          (cd apps/extension/dist && zip -qr ../../../out/space-authenticator-extension-webstore.zip .)
+          (cd apps/extension/dist && zip -qr ../../../out/Space-Authenticator-chrome-webstore.zip .)
       - uses: actions/upload-artifact@v4
         with: { name: extension, path: out/*.zip, if-no-files-found: error }
       - name: Upload to Chrome Web Store
@@ -91,7 +91,7 @@ jobs:
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-        run: npx --yes chrome-webstore-upload-cli@3 --source out/space-authenticator-extension-webstore.zip
+        run: npx --yes chrome-webstore-upload-cli@3 --source out/Space-Authenticator-chrome-webstore.zip
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

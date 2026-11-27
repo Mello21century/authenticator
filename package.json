@@ -2,9 +2,12 @@
   "name": "authenticator",
   "private": true,
   "packageManager": "pnpm@11.0.9",
-  "engines": { "node": ">=24" },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "pnpm -r --if-present test",
     "build": "pnpm -r --if-present build"
-  }
+  },
+  "license": "SEE LICENSE IN LICENSE"
 }
