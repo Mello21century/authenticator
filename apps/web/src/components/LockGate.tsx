@@ -22,11 +22,12 @@ export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
   const [bio, setBio] = useState<boolean | null>(null);
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
+  const label = desktop!.biometricLabel ?? 'Touch ID';
 
   async function tryBio() {
     setErr('');
     if (await desktop!.unlockBiometric()) onUnlocked();
-    else setErr('Touch ID was cancelled');
+    else setErr(`${label} was cancelled`);
   }
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function LockScreen({ onUnlocked }: { onUnlocked(): void }) {
         <div className="lock-icon">🔒</div>
         <h2>Space Authenticator is locked</h2>
         <p className="muted" style={{ margin: 0 }}>{user?.email}</p>
-        {bio && <button className="btn primary block" onClick={tryBio}>Unlock with Touch ID</button>}
+        {bio && <button className="btn primary block" onClick={tryBio}>Unlock with {label}</button>}
         {bio !== null && (!bio || err) && (
           <form className="stack" style={{ width: '100%' }} onSubmit={withPassword}>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" aria-label="Password" autoFocus autoComplete="current-password" />

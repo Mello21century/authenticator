@@ -7,6 +7,7 @@ import { EntryForm } from '../components/EntryForm';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useCodes, useTick } from '../lib/codes';
+import { desktop } from '../lib/desktop';
 import { Modal, errMsg, useToast } from '../lib/ui';
 
 export default function Vault({ locked }: { locked: boolean }) {
@@ -25,6 +26,21 @@ export default function Vault({ locked }: { locked: boolean }) {
   const [sharing, setSharing] = useState<Entry | null>(null);
   const entries = useQuery({ queryKey: ['entries'], queryFn: api.listEntries });
   const codes = useCodes(!locked);
+  // extension: pre-filter by the current tab's site (only when it changes and something matches)
+  const lastHint = useRef<string | null>(null);
+  const data = entries.data;
+  useEffect(() => {
+    if (!desktop?.getSearchHint || !data) return;
+    const apply = async () => {
+      const h = await desktop!.getSearchHint!();
+      if (!h || h === lastHint.current) return;
+      lastHint.current = h;
+      if (data.some(e => `${e.issuer} ${e.label}`.toLowerCase().includes(h))) { setQ(h); searchRef.current?.focus(); searchRef.current?.select(); }
+    };
+    void apply();
+    window.addEventListener('focus', apply);
+    return () => window.removeEventListener('focus', apply);
+  }, [data]);
   useTick();
 
   const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: ['entries'] }), qc.invalidateQueries({ queryKey: ['codes'] })]);

@@ -45,6 +45,16 @@ AUTH_API_URL=https://auth.your-domain/api pnpm --filter desktop dist   # dmg / n
 The server URL can also be changed on the login screen (Server). Add `app://authenticator` to `CORS_ORIGINS` on the API.
 Signing: set `CSC_LINK`/`CSC_KEY_PASSWORD` (macOS Developer ID + notarization env) before `dist`.
 
+## Chrome extension (`apps/extension`)
+Side panel with the same vault UI, locked behind Touch ID / Windows Hello (WebAuthn platform authenticator), password fallback.
+- Build: `pnpm --filter extension build` -> `apps/extension/dist`
+- Install for testing: `chrome://extensions` -> Developer mode -> **Load unpacked** -> pick `apps/extension/dist`
+- Open: toolbar icon or **Cmd/Ctrl+Shift+2**; the search is pre-filled with the current site when a matching account exists.
+- The `key` in `manifest.json` pins the ID to `dgmbchpaamaioijdcifhfjbbpkgkdadl` (allowed in the API's `CORS_ORIGINS`). `apps/extension/key.pem` is gitignored; keep a backup. A Chrome Web Store listing gets its own ID: add it to `CORS_ORIGINS`.
+
+## Logo
+`design/logo/apply.sh [source.png]` regenerates every app icon from one 1024px image.
+
 ## Mobile (Expo)
 
 ```sh

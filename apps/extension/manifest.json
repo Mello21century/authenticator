@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Space Authenticator",
+  "short_name": "Authenticator",
+  "description": "Your 2FA codes in Chrome's side panel, locked behind Touch ID / Windows Hello.",
+  "version": "0.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA/WGgsCn89rnm7RvU0pMPborL7YY6WkRUlrioJjXDeyHcVAHdn7SKujAhxeKh0+rzDkum7BEwxmAWn75Mo5XH/zfyfjjgFFFY+ycgZsr7JHja1ZAO6UeXFSWUTTnLZcbuhn2ZhNxA5LOKdxJhlQV52Buz3qeUnLR3/Pwa9XH4QfCEc9FScJB5Hl36yXAHnSlJC9EVa5RYEcDKpCtxA7tuwnMxm7Fp3Jn8/qORNarQsxIqCfcVg4ZN1Vm0TKBGHpDv9AU8ZDGNfE8v/gyMPdbhTKBAKfYoVWqf2O/x/7If96fcyX9tFiOgFAfYUsaI0VFRbwVvGos1CJkBlLaHGkNkbwIDAQAB",
+  "minimum_chrome_version": "116",
+  "icons": { "16": "icon-16.png", "32": "icon-32.png", "48": "icon-48.png", "128": "icon-128.png" },
+  "action": { "default_title": "Space Authenticator", "default_icon": { "16": "icon-16.png", "32": "icon-32.png" } },
+  "side_panel": { "default_path": "panel.html" },
+  "background": { "service_worker": "background.js" },
+  "permissions": ["sidePanel", "storage", "activeTab"],
+  "host_permissions": ["https://authenticator.sz4h.com/*"],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Ctrl+Shift+2", "mac": "Command+Shift+2" },
+      "description": "Open Space Authenticator"
+    }
+  }
+}

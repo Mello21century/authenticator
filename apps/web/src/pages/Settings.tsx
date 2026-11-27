@@ -239,7 +239,7 @@ function Security() {
   return (
     <section className="section">
       <h3>App lock</h3>
-      <p className="muted" style={{ margin: 0 }}>{bio ? 'Codes are hidden until you unlock with Touch ID.' : 'Codes are hidden until you re-enter your password.'} The app always locks when it starts.</p>
+      <p className="muted" style={{ margin: 0 }}>{bio ? `Codes are hidden until you unlock with ${desktop!.biometricLabel ?? 'Touch ID'}.` : 'Codes are hidden until you re-enter your password.'} The app always locks when it starts.</p>
       <Field label="Lock again after">
         <select value={ms ?? ''} onChange={e => { const v = Number(e.target.value); setMs(v); void desktop!.setLockTimeout(v); }}>
           {TIMEOUTS.map(t => <option key={t.ms} value={t.ms}>{t.label}</option>)}

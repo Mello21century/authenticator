@@ -1,4 +1,4 @@
-/** Bridge exposed by apps/desktop preload. Undefined in a normal browser. */
+/** Bridge exposed by apps/desktop preload or apps/extension bridge.js. Undefined in a normal browser. */
 export interface DesktopBridge {
   native: true;
   platform: 'darwin' | 'win32' | 'linux';
@@ -13,6 +13,10 @@ export interface DesktopBridge {
   onLock(cb: () => void): () => void;
   getLockTimeout(): Promise<number>;
   setLockTimeout(ms: number): Promise<void>;
+  /** Chrome extension only. */
+  biometricLabel?: string;
+  /** Chrome extension only: short name of the current tab's site, to pre-filter the vault. */
+  getSearchHint?(): Promise<string | null>;
 }
 
 declare global {
