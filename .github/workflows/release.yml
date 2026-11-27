@@ -1,0 +1,105 @@
+# Builds the macOS DMG, Windows installer and Chrome extension.
+# - Push a tag like v0.2.0  -> builds everything and attaches it to a GitHub Release.
+# - Actions tab -> "Release" -> Run workflow -> builds and keeps the files as run artifacts (no release).
+#
+# Optional secrets (Settings -> Secrets and variables -> Actions); without them the builds are unsigned:
+#   MAC_CERT_P12_BASE64, MAC_CERT_PASSWORD   Developer ID Application cert exported as .p12 (base64)
+#   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID   notarization
+#   CWS_EXTENSION_ID, CWS_CLIENT_ID, CWS_CLIENT_SECRET, CWS_REFRESH_TOKEN   Chrome Web Store upload
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: --mac dmg --arm64 --x64
+            files: apps/desktop/release/*.dmg
+          - os: windows-latest
+            target: --win nsis --x64
+            files: apps/desktop/release/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --filter desktop --filter web --filter @auth/shared
+      - name: Version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: cd apps/desktop && npm pkg set version="${GITHUB_REF_NAME#v}"
+      - run: pnpm --filter web build && pnpm --filter desktop build
+      - name: Package
+        shell: bash
+        working-directory: apps/desktop
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # no certificate secret -> build unsigned instead of failing
+          if [ -z "$CSC_LINK" ]; then unset CSC_LINK CSC_KEY_PASSWORD; export CSC_IDENTITY_AUTO_DISCOVERY=false; fi
+          [ -n "$APPLE_ID" ] || unset APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+          npx electron-builder ${{ matrix.target }} --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+
+  extension:
+    runs-on: ubuntu-latest
+    env:
+      HAS_CWS: ${{ secrets.CWS_REFRESH_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --filter web --filter @auth/shared
+      - name: Version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: node -e "const f='apps/extension/manifest.json',m=require('./'+f);m.version=process.env.GITHUB_REF_NAME.slice(1);require('fs').writeFileSync(f,JSON.stringify(m,null,2))"
+      - run: pnpm --filter web build && node apps/extension/build.mjs
+      - name: Zip
+        run: |
+          mkdir -p out
+          (cd apps/extension/dist && zip -qr ../../../out/space-authenticator-extension.zip .)
+          # Chrome Web Store rejects the "key" field; the store assigns its own ID
+          node -e "const f='apps/extension/dist/manifest.json',m=require('./'+f);delete m.key;require('fs').writeFileSync(f,JSON.stringify(m,null,2))"
+          (cd apps/extension/dist && zip -qr ../../../out/space-authenticator-extension-webstore.zip .)
+      - uses: actions/upload-artifact@v4
+        with: { name: extension, path: out/*.zip, if-no-files-found: error }
+      - name: Upload to Chrome Web Store
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_CWS == 'true'
+        env:
+          EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+        run: npx --yes chrome-webstore-upload-cli@3 --source out/space-authenticator-extension-webstore.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [desktop, extension]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: dist, merge-multiple: true }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
