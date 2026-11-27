@@ -92,7 +92,8 @@ function registerIpc() {
 }
 
 function createTray() {
-  const img = nativeImage.createFromPath(join(assets, 'trayTemplate.png'));
+  // macOS: monochrome template icon tinted by the menu bar; Windows/Linux: full-colour logo
+  const img = nativeImage.createFromPath(join(assets, process.platform === 'darwin' ? 'trayTemplate.png' : 'tray.png'));
   img.setTemplateImage(true);
   tray = new Tray(img);
   tray.setToolTip('Space Authenticator');

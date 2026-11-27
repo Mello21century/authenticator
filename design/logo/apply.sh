@@ -11,4 +11,5 @@ sips -z 180 180 "$SRC" --out apps/web/public/apple-touch-icon.png >/dev/null
 sips -z 256 256 "$SRC" --out apps/web/public/logo.png >/dev/null
 sips -z 64 64 "$SRC" --out apps/web/public/favicon.png >/dev/null
 for s in 16 32 48 128; do sips -z $s $s "$SRC" --out apps/extension/icons/icon-$s.png >/dev/null; done
+sips -z 32 32 "$SRC" --out apps/desktop/build/tray.png >/dev/null
 echo "icons updated from $SRC"
