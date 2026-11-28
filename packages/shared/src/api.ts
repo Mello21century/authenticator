@@ -12,6 +12,9 @@ export class ApiError extends Error {
   constructor(public status: number, public body: unknown, message: string) { super(message); }
 }
 
+/** True only when the server rejected the session (401). Network errors and 5xx keep the user signed in. */
+export const isSessionRejected = (e: unknown) => e instanceof ApiError && e.status === 401;
+
 export type Api = ReturnType<typeof createApi>;
 
 export function createApi(o: ApiOptions) {
@@ -26,9 +29,11 @@ export function createApi(o: ApiOptions) {
     const res = await fetch(o.baseUrl + path, {
       method, headers, body: body === undefined ? undefined : JSON.stringify(body),
       credentials: o.native ? 'omit' : 'include',
+      signal: AbortSignal.timeout?.(20_000), // a stuck server shows an error instead of hanging forever
     });
     const text = await res.text();
-    const data = text ? JSON.parse(text) : undefined;
+    let data: any;
+    try { data = text ? JSON.parse(text) : undefined; } catch { data = undefined; } // proxy error pages are HTML
     if (!res.ok) {
       const msg = Array.isArray(data?.message) ? data.message.join(', ') : data?.message ?? res.statusText;
       throw new ApiError(res.status, data, msg || `HTTP ${res.status}`);
@@ -47,8 +52,9 @@ export function createApi(o: ApiOptions) {
   function refresh(): Promise<AuthResponse> {
     refreshing ??= (async () => {
       try {
-        const body = o.native ? { refreshToken: await o.getRefreshToken?.() } : undefined;
-        return await handleAuth(await raw<AuthResponse>('POST', '/auth/refresh', body, false));
+        const token = o.native ? await o.getRefreshToken?.() : undefined;
+        if (o.native && !token) throw new ApiError(401, null, 'Not signed in'); // nothing saved: go straight to sign-in
+        return await handleAuth(await raw<AuthResponse>('POST', '/auth/refresh', o.native ? { refreshToken: token } : undefined, false));
       } finally { refreshing = null; }
     })();
     return refreshing;
@@ -59,7 +65,8 @@ export function createApi(o: ApiOptions) {
       return await raw<T>(method, path, body);
     } catch (e) {
       if (!(e instanceof ApiError) || e.status !== 401) throw e;
-      try { await refresh(); } catch {
+      try { await refresh(); } catch (re) {
+        if (!isSessionRejected(re)) throw re; // server down: keep the session, try again later
         accessToken = null;
         if (o.native) await o.setRefreshToken?.(null);
         o.onAuthLost?.();

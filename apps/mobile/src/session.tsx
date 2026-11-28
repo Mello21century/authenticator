@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { AppState } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
-import type { AuthResponse, User } from '@auth/shared';
+import { isSessionRejected, type AuthResponse, type User } from '@auth/shared';
 import { api, loadServer, onAuthLost } from './api';
 import { LockState } from '@auth/shared';
 
@@ -10,6 +10,8 @@ const HOUR = 3_600_000;
 
 interface Session {
   ready: boolean;
+  offline: boolean; // startup couldn't reach the server; retrying, session kept
+  skipToSignIn(): void;
   user: User | null;
   locked: boolean;
   covered: boolean; // app switcher privacy cover
@@ -28,6 +30,8 @@ export const useSession = () => useContext(Ctx);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const lock = useRef(new LockState(HOUR)).current;
   const [ready, setReady] = useState(false);
+  const [offline, setOffline] = useState(false);
+  const retry = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [user, setUser] = useState<User | null>(null);
   const [locked, setLocked] = useState(true);
   const [covered, setCovered] = useState(false);
@@ -51,9 +55,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       await loadServer();
       const t = Number(await SecureStore.getItemAsync('lockTimeout'));
       if (Number.isFinite(t) && (await SecureStore.getItemAsync('lockTimeout')) !== null) { lock.timeoutMs = t; setTimeoutState(t); }
-      try { setUser((await api.refresh()).user); } catch { setUser(null); }
-      setReady(true);
+      const boot = async () => {
+        try { setUser((await api.refresh()).user); }
+        catch (e) {
+          // server down or no network: don't sign out, keep retrying
+          if (!isSessionRejected(e)) { setOffline(true); retry.current = setTimeout(boot, 5000); return; }
+          setUser(null);
+        }
+        setOffline(false); setReady(true);
+      };
+      await boot();
     })();
+    return () => clearTimeout(retry.current);
   }, [lock]);
 
   useEffect(() => {
@@ -66,7 +79,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [lock]);
 
   const value: Session = {
-    ready, user, locked, covered, lockTimeout, lockError, unlock,
+    skipToSignIn() { clearTimeout(retry.current); setOffline(false); setReady(true); },
+    ready, offline, user, locked, covered, lockTimeout, lockError, unlock,
     setSession: r => { setUser(r.user); lock.unlock(); setLocked(false); }, // fresh sign-in counts as unlock
     async signOut() { try { await api.logout(); } finally { setUser(null); } },
     async setLockTimeout(ms) { lock.timeoutMs = ms; setTimeoutState(ms); await SecureStore.setItemAsync('lockTimeout', String(ms)); },

@@ -16,7 +16,7 @@ type Route = { name: 'vault' } | { name: 'add'; editing?: Entry } | { name: 'set
 
 function Root() {
   const c = useTheme();
-  const { ready, user, locked, covered, unlock, lockError, signOut } = useSession();
+  const { ready, offline, skipToSignIn, user, locked, covered, unlock, lockError, signOut } = useSession();
   const [route, setRoute] = useState<Route>({ name: 'vault' });
   const [vaultKey, setVaultKey] = useState(0);
   // prompt biometrics once per lock event; the prompt itself flips AppState, so don't re-prompt after a cancel
@@ -28,7 +28,13 @@ function Root() {
 
   const update = useForceUpdate(ready);
 
-  if (!ready) return <View style={{ flex: 1, backgroundColor: c.bg }} />;
+  if (!ready) return (
+    <View style={{ flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 }}>
+      <Image source={require('./assets/icon.png')} style={{ width: 56, height: 56, borderRadius: 14 }} />
+      <T muted>{offline ? "Can't reach the server. Retrying…" : 'Connecting…'}</T>
+      {offline && <Btn title="Go to sign in" onPress={skipToSignIn} />}
+    </View>
+  );
   if (update.required) return (
     <View style={{ flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 }}>
       <Image source={require('./assets/icon.png')} style={{ width: 68, height: 68, borderRadius: 16 }} />

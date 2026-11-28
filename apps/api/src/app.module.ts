@@ -1,6 +1,7 @@
-import { Controller, Get, Global, Inject, Module, type DynamicModule } from '@nestjs/common';
+import { Controller, Get, Global, Inject, Module, ServiceUnavailableException, type DynamicModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { MongooseModule } from '@nestjs/mongoose';
+import { InjectConnection, MongooseModule } from '@nestjs/mongoose';
+import type { Connection } from 'mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CONFIG, type AppConfig } from './config';
 import { VaultCipher } from './crypto/vault-cipher';
@@ -12,7 +13,12 @@ import { VaultModule } from './vault/vault.module';
 
 @Controller('health')
 class HealthController {
-  @Get() health() { return { ok: true }; }
+  constructor(@InjectConnection() private readonly db: Connection) {}
+  // checks MongoDB too, so Docker/Dokploy show the API unhealthy when the database is gone
+  @Get() async health() {
+    try { await this.db.db!.admin().ping(); } catch { throw new ServiceUnavailableException('Database unavailable'); }
+    return { ok: true };
+  }
 }
 
 /** Public: lets mobile apps block themselves until the user installs a supported version. */
@@ -47,7 +53,7 @@ export class AppModule {
       module: AppModule,
       imports: [
         CoreModule.forRoot(cfg),
-        MongooseModule.forRoot(cfg.mongoUrl),
+        MongooseModule.forRoot(cfg.mongoUrl, { serverSelectionTimeoutMS: 5000 }), // fail fast instead of hanging 30s when the DB is down
         AuthModule.forRoot(cfg),
         EntriesModule,
         MembersModule,

@@ -22,14 +22,27 @@ document.head.appendChild(style);
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 10_000 } } });
 
+function Starting() {
+  const { offline, skipToSignIn } = useAuth();
+  return (
+    <div className="auth-wrap">
+      <div className="auth-card" style={{ textAlign: 'center' }}>
+        <img className="brand-mark" src="./logo.png" alt="" style={{ margin: '0 auto' }} />
+        <p className="muted" role="status" style={{ margin: 0 }}>{offline ? "Can't reach the server. Retrying…" : 'Connecting…'}</p>
+        {offline && <button className="btn small" onClick={skipToSignIn}>Go to sign in</button>}
+      </div>
+    </div>
+  );
+}
+
 function Protected({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
-  if (!ready) return null;
+  if (!ready) return <Starting />;
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 }
 function Public({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
-  if (!ready) return null;
+  if (!ready) return <Starting />;
   return user ? <Navigate to="/" replace /> : <>{children}</>;
 }
 

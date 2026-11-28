@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createApi, ApiError } from '../src';
+import { createApi, ApiError, isSessionRejected } from '../src';
 
 type Call = { url: string; init: RequestInit };
 let calls: Call[];
@@ -42,6 +42,36 @@ describe('api client', () => {
     api.setAccessToken('old');
     await expect(api.listEntries()).rejects.toBeInstanceOf(ApiError);
     expect(onAuthLost).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the stored session when refresh fails because the server is down', async () => {
+    let stored: string | null = 'r1';
+    mockFetch(url => url.endsWith('/auth/refresh') ? json(500, { message: 'Internal server error' }) : json(401, { message: 'no' }));
+    const onAuthLost = vi.fn();
+    const api = createApi({ baseUrl: 'http://x/api', native: true, onAuthLost, getRefreshToken: async () => stored, setRefreshToken: async t => { stored = t; } });
+    api.setAccessToken('old');
+    await expect(api.listEntries()).rejects.toMatchObject({ status: 500 });
+    expect(stored).toBe('r1');
+    expect(onAuthLost).not.toHaveBeenCalled();
+  });
+
+  it('native refresh with no saved token is rejected without calling the server', async () => {
+    mockFetch(() => json(500, {}));
+    const api = createApi({ baseUrl: 'http://x/api', native: true, getRefreshToken: async () => null, setRefreshToken: async () => {} });
+    await expect(api.refresh()).rejects.toMatchObject({ status: 401 });
+    expect(calls).toHaveLength(0);
+  });
+
+  it('isSessionRejected is true only for 401', () => {
+    expect(isSessionRejected(new ApiError(401, null, 'x'))).toBe(true);
+    expect(isSessionRejected(new ApiError(500, null, 'x'))).toBe(false);
+    expect(isSessionRejected(new TypeError('Failed to fetch'))).toBe(false);
+  });
+
+  it('turns a non-JSON error page into an ApiError', async () => {
+    mockFetch(() => new Response('<html>502 Bad Gateway</html>', { status: 502, statusText: 'Bad Gateway' }));
+    const api = createApi({ baseUrl: 'http://x/api', native: false });
+    await expect(api.appVersion()).rejects.toMatchObject({ status: 502 });
   });
 
   it('native mode sends refresh token in body and stores rotated one', async () => {
